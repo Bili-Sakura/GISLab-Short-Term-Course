@@ -170,6 +170,11 @@ given the same first pixel value. *</p>
     <img src="../assets/add_noice_full.png">
     <img src="../assets/denoice_full.png">
 </div>
+<div align="center">
+    <img src="../assets/DDPM_algorithm.png">
+Algorithm of denoising diffusion probabilistic models (DDPM) [15].
+</div>
+
 
 ## Techniques of Diffusion Models
 
@@ -286,3 +291,5 @@ Course Objectives:
 [13] S. Khanna et al., ‘DiffusionSat: A Generative Foundation Model for Satellite Imagery’, in International Conference on Learning Representations (ICLR 2024), Dec. 2023.
 
 [14] R. Gupta et al., ‘xBD: A Dataset for Assessing Building Damage from Satellite Imagery’. arXiv, Nov. 21, 2019. 
+
+[15] J. Ho, A. Jain, and P. Abbeel, ‘Denoising Diffusion Probabilistic Models’, in Advances in Neural Information Processing Systems, Curran Associates, Inc., 2020, pp. 6840–6851.
