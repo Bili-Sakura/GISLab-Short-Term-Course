@@ -30,12 +30,10 @@
   - Evolution of Architectures
   - Conditional Generation
   - Robustness
-
-- [Diffusion Model in Remote Sensing (RS)](#diffusion-model-in-remote-sensing)
-  - section1
-  - section2
-  - section3
 - [**Practice on Diffusion Model**](#practice-on-diffusion-model)
+  - Diffusion Model in Remote Sensing (RS)
+  - Research Background
+
 
 ## Background
 
@@ -180,12 +178,41 @@ given the same first pixel value. *</p>
 
 ### Conditional Generation
 
+<div align="center"><img src="../assets/video_clip11.gif"><p>
+    Conditional image generation with sketch.*
+    </p></div>
+
+> [https](https://www.youtube.com/watch?v=zc5NTeJbk-k)[://](https://www.youtube.com/watch?v=zc5NTeJbk-k)[www.youtube.com/watch?v=zc5NTeJbk-k](https://www.youtube.com/watch?v=zc5NTeJbk-k)
+>
+> https://www.canva.com/
+
 ### Robustness
 
-## Diffusion Model in Remote Sensing
+<div align="center"><img src="../assets/attacks_on_stable_diffusion.png"><p> An illustration of human attack against Stable Diffusion*. Adversarially modified content is highlighted in red [11].</p></div>
 
+> https://stability.ai/news/stable-diffusion-3
 
 ## Practice on Diffusion Model
+
+### Diffusion Model in Remote Sensing
+
+<div align="center"><img src="../assets/MetaEarth.png"><p> MetaEarth [12]: A generative foundation model for global-scale remote sensing image generation. Remote sensing image generation samples. </p><img src="../assets/MetaEarth_architecture.png"><p>Overview of MetaEarth architecture [12].</p>
+</div>
+
+<div align="center"><img src="../assets/DiffusionSAT_overview.png"><p> Conditioning on freely available metadata and using large, publicly available satellite imagery datasets shows DiffusionSat [13] is a powerful generative foundation model for remote sensing data. Left: Overview of architecture. </p><img src="../assets/DiffusionSAT_pre_post_pair_cases.png"><p>Onpainting results [13].</p>
+</div>
+
+### Research Background
+
+<div align="center">
+    <div style="display: flex; justify-content: center;">
+        <img src="../assets/xbd_description1.png" width="80%">
+        <img src="../assets/xbd_example.png" width="35%">
+    </div>
+    <p> Left: Disaster types and disasters represented in xBD [14] around the world. 
+Right: Building polygons (shown in green) on imagery from Hurricane Michael (2018).
+</p>
+</div>
 
 ## References
 
@@ -210,3 +237,9 @@ given the same first pixel value. *</p>
 [10] O. Ronneberger, P. Fischer, and T. Brox, ‘U-Net: Convolutional Networks for Biomedical Image Segmentation’, in International Conference on Medical Image Computing and Computer-Assisted Intervention, N. Navab, J. Hornegger, W. M. Wells, and A. F. Frangi, Eds., Cham: Springer International Publishing, 2015, pp. 234–241.
 
 [11] H. Gao, H. Zhang, Y. Dong, and Z. Deng, ‘Evaluating the Robustness of Text-to-image Diffusion Models against Real-world Attacks’. arXiv, Jun. 15, 2023.
+
+[12] Z. Yu, C. Liu, L. Liu, Z. Shi, and Z. Zou, ‘MetaEarth: A Generative Foundation Model for Global-Scale Remote Sensing Image Generation’. ArXiv. May 28, 2024.
+
+[13] S. Khanna et al., ‘DiffusionSat: A Generative Foundation Model for Satellite Imagery’, in International Conference on Learning Representations (ICLR 2024), Dec. 2023.
+
+[14] R. Gupta et al., ‘xBD: A Dataset for Assessing Building Damage from Satellite Imagery’. arXiv, Nov. 21, 2019. 
