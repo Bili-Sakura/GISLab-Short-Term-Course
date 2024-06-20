@@ -66,8 +66,10 @@
 
 ### Progress of Deep Generative Models
 
-<div align="center"><img src="../assets/timeline_of_gen.png"><p>Progress of deep generative models [1]. </p></div>
-
+<div align="center">
+    <img src="../assets/timeline_of_gen.png">
+    <p>Progress of deep generative models <a href="https://thudzj.github.io/">[1]</a>.</p>
+</div>
 ## Introduction
 
 ### Generation from Scratch
@@ -149,7 +151,7 @@ given the same first pixel value. *</p>
 
 <div align="center">
     <img src="../assets/PixelCNN_overview.png">
-<p> Illustration of PixelCNN [5].(Left: To generate pixel xi one conditions on all the previously generated pixels left and above of xi. Center: To generate a pixel in the multi-scale case we can also condition on the subsampled image pixels. Right: Diagram of the connectivity inside a masked convolution. In the first layer, each of the RGB channels is connected to previous channels and to the context, but is not connected to itself. In subsequent layers, the channels are also connected to themselves.)</p>
+<p> Illustration of PixelCNN <a href="https://proceedings.mlr.press/v48/oord16.html">[5]</a>.(Left: To generate pixel xi one conditions on all the previously generated pixels left and above of xi. Center: To generate a pixel in the multi-scale case we can also condition on the subsampled image pixels. Right: Diagram of the connectivity inside a masked convolution. In the first layer, each of the RGB channels is connected to previous channels and to the context, but is not connected to itself. In subsequent layers, the channels are also connected to themselves.)</p>
 </div>
 
 > <https://www.youtube.com/watch?v=zc5NTeJbk-k>
@@ -169,7 +171,7 @@ given the same first pixel value. *</p>
 </div>
 <div align="center">
     <img src="../assets/DDPM_algorithm.png">
-Algorithm of denoising diffusion probabilistic models (DDPM) [15].
+Algorithm of denoising diffusion probabilistic models (DDPM) <a href="https://proceedings.neurips.cc/paper/2020/hash/4c5bcfec8584af0d967f1ab10179ca4b-Abstract.html">[15]</a>.
 </div>
 
 ## Techniques of Diffusion Models
@@ -190,7 +192,7 @@ Algorithm of denoising diffusion probabilistic models (DDPM) [15].
 
 ### Robustness
 
-<div align="center"><img src="../assets/attacks_on_stable_diffusion.png"><p> An illustration of human attack against Stable Diffusion*. Adversarially modified content is highlighted in red [11].</p></div>
+<div align="center"><img src="../assets/attacks_on_stable_diffusion.png"><p> An illustration of human attack against Stable Diffusion*. Adversarially modified content is highlighted in red <a href="http://arxiv.org/abs/2306.13103">[11]</a>.</p></div>
 
 > <https://stability.ai/news/stable-diffusion-3>
 
@@ -198,10 +200,10 @@ Algorithm of denoising diffusion probabilistic models (DDPM) [15].
 
 ### Diffusion Model in Remote Sensing
 
-<div align="center"><img src="../assets/MetaEarth.png"><p> MetaEarth [12]: A generative foundation model for global-scale remote sensing image generation. Remote sensing image generation samples. </p><img src="../assets/MetaEarth_architecture.png"><p>Overview of MetaEarth architecture [12].</p>
+<div align="center"><img src="../assets/MetaEarth.png"><p> MetaEarth <a href="http://arxiv.org/abs/2405.13570">[12]</a>: A generative foundation model for global-scale remote sensing image generation. Remote sensing image generation samples. </p><img src="../assets/MetaEarth_architecture.png"><p>Overview of MetaEarth architecture <a href="http://arxiv.org/abs/2405.13570">[12]</a>.</p>
 </div>
 
-<div align="center"><img src="../assets/DiffusionSAT_overview.png"><p> Conditioning on freely available metadata and using large, publicly available satellite imagery datasets shows DiffusionSat [13] is a powerful generative foundation model for remote sensing data. Left: Overview of architecture. </p><img src="../assets/DiffusionSAT_pre_post_pair_cases.png"><p>Onpainting results [13].</p>
+<div align="center"><img src="../assets/DiffusionSAT_overview.png"><p> Conditioning on freely available metadata and using large, publicly available satellite imagery datasets shows DiffusionSat <a href="http://arxiv.org/abs/2312.03606">[13]</a> is a powerful generative foundation model for remote sensing data. Left: Overview of architecture. </p><img src="../assets/DiffusionSAT_pre_post_pair_cases.png"><p>Onpainting results <a href="http://arxiv.org/abs/2312.03606">[13]</a>.</p>
 </div>
 
 ### Research Background
@@ -211,7 +213,7 @@ Algorithm of denoising diffusion probabilistic models (DDPM) [15].
         <img src="../assets/xbd_description1.png" width="80%">
         <img src="../assets/xbd_example.png" width="35%">
     </div>
-    <p> Left: Disaster types and disasters represented in xBD [14] around the world.
+    <p> Left: Disaster types and disasters represented in xBD <a href="http://arxiv.org/abs/1911.09296">[14]</a> around the world.
 Right: Building polygons (shown in green) on imagery from Hurricane Michael (2018).
 </p>
 </div>
