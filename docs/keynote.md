@@ -1,5 +1,7 @@
 # Introduction to Diffusion Models —— GIS Lab 2024 Short-term Course
 
+> Keynote for "Introduction to Diffusion Models —— GIS Lab 2024 Short-term Course" is available on BaiduNetdisk [here](https://pan.baidu.com/s/1NAZi_NWV3lNLi1rNXhJxhA?pwd=0702).
+
 > Presentor: Sakura (Chen Zhenyuan) M.Eng.
 >
 > Department: School of Earth Science, Zhejiang University
@@ -34,7 +36,6 @@
   - Diffusion Model in Remote Sensing (RS)
   - Research Background
   - Experiments
-
 
 ## Background
 
@@ -106,11 +107,10 @@
     <img src="../assets/pixel_probability.jpg" width="50%">
     <img src="../assets/video_clip6.gif">
 </div>
-<p>Left: A determined neural network give the identical result 
+<p>Left: A determined neural network give the identical result
 given the same first pixel value. *</p>
 <p>Right: We can randomly sample pixel value in each step to generate different images from identical initial pixel. *</p>
 </div>
-
 
 <div align="center">
     <img src="../assets/video_clip7.gif">
@@ -137,7 +137,6 @@ given the same first pixel value. *</p>
 </p>
 </div>
 
-
 <div align="center">
     <img src="../assets/video_clip9.gif">
 <p> Remove indepedent pixels graudually (the reversed process is to predict the image).*</p>
@@ -152,8 +151,6 @@ given the same first pixel value. *</p>
     <img src="../assets/PixelCNN_overview.png">
 <p> Illustration of PixelCNN [5].(Left: To generate pixel xi one conditions on all the previously generated pixels left and above of xi. Center: To generate a pixel in the multi-scale case we can also condition on the subsampled image pixels. Right: Diagram of the connectivity inside a masked convolution. In the first layer, each of the RGB channels is connected to previous channels and to the context, but is not connected to itself. In subsequent layers, the channels are also connected to themselves.)</p>
 </div>
-
-
 
 > <https://www.youtube.com/watch?v=zc5NTeJbk-k>
 
@@ -175,7 +172,6 @@ given the same first pixel value. *</p>
 Algorithm of denoising diffusion probabilistic models (DDPM) [15].
 </div>
 
-
 ## Techniques of Diffusion Models
 
 ### Evolution of Architectures
@@ -190,13 +186,13 @@ Algorithm of denoising diffusion probabilistic models (DDPM) [15].
 
 > [https](https://www.youtube.com/watch?v=zc5NTeJbk-k)[://](https://www.youtube.com/watch?v=zc5NTeJbk-k)[www.youtube.com/watch?v=zc5NTeJbk-k](https://www.youtube.com/watch?v=zc5NTeJbk-k)
 >
-> https://www.canva.com/
+> <https://www.canva.com/>
 
 ### Robustness
 
 <div align="center"><img src="../assets/attacks_on_stable_diffusion.png"><p> An illustration of human attack against Stable Diffusion*. Adversarially modified content is highlighted in red [11].</p></div>
 
-> https://stability.ai/news/stable-diffusion-3
+> <https://stability.ai/news/stable-diffusion-3>
 
 ## Practice on Diffusion Model
 
@@ -215,7 +211,7 @@ Algorithm of denoising diffusion probabilistic models (DDPM) [15].
         <img src="../assets/xbd_description1.png" width="80%">
         <img src="../assets/xbd_example.png" width="35%">
     </div>
-    <p> Left: Disaster types and disasters represented in xBD [14] around the world. 
+    <p> Left: Disaster types and disasters represented in xBD [14] around the world.
 Right: Building polygons (shown in green) on imagery from Hurricane Michael (2018).
 </p>
 </div>
@@ -244,8 +240,6 @@ Course Objectives:
 
 \7. Attempt to build or run condition-constrained diffusion models to generate pre- and post-disaster remote sensing image pairs
 
-
-
 课程目标：
 
 \1. 学会使用Github进行团队协作
@@ -266,21 +260,21 @@ Course Objectives:
 
 [1] Z. Deng, "扩散模型: 方法与应用" [Advanced Neural Networks, Spring, 2024], Qing Yuan Research Institute, Shanghai Jiao Tong University, 2024.
 
-[2] K. Simonyan and A. Zisserman, ‘Very Deep Convolutional Networks for Large-Scale Image Recognition’, in International Conference on Learning Representations, 2014. 
+[2] K. Simonyan and A. Zisserman, ‘Very Deep Convolutional Networks for Large-Scale Image Recognition’, in International Conference on Learning Representations, 2014.
 
-[3] W. Yu, K. Yang, T. Xiao, H. Yao, and Y. Rui, ‘Visualizing and Comparing AlexNet and VGG using Deconvolutional Layers’, 2016. 
+[3] W. Yu, K. Yang, T. Xiao, H. Yao, and Y. Rui, ‘Visualizing and Comparing AlexNet and VGG using Deconvolutional Layers’, 2016.
 
-[4] O. Russakovsky et al., ‘ImageNet Large Scale Visual Recognition Challenge’. arXiv, Jan. 29, 2015. 
+[4] O. Russakovsky et al., ‘ImageNet Large Scale Visual Recognition Challenge’. arXiv, Jan. 29, 2015.
 
-[5] A. van den Oord, N. Kalchbrenner, and K. Kavukcuoglu, ‘Pixel Recurrent Neural Networks’, in Proceedings of The 33rd International Conference on Machine Learning, PMLR, Jun. 2016, pp. 1747–1756. 
+[5] A. van den Oord, N. Kalchbrenner, and K. Kavukcuoglu, ‘Pixel Recurrent Neural Networks’, in Proceedings of The 33rd International Conference on Machine Learning, PMLR, Jun. 2016, pp. 1747–1756.
 
-[6] Y. Song, J. Sohl-Dickstein, D. P. Kingma, A. Kumar, S. Ermon, and B. Poole, ‘Score-Based Generative Modeling through Stochastic Differential Equations’, presented at the International Conference on Learning Representations, Oct. 2020. 
+[6] Y. Song, J. Sohl-Dickstein, D. P. Kingma, A. Kumar, S. Ermon, and B. Poole, ‘Score-Based Generative Modeling through Stochastic Differential Equations’, presented at the International Conference on Learning Representations, Oct. 2020.
 
-[7] J. Sohl-Dickstein, E. Weiss, N. Maheswaranathan, and S. Ganguli, ‘Deep Unsupervised Learning using Nonequilibrium Thermodynamics’, in Proceedings of the 32nd International Conference on Machine Learning, PMLR, Jun. 2015, pp. 2256–2265. 
+[7] J. Sohl-Dickstein, E. Weiss, N. Maheswaranathan, and S. Ganguli, ‘Deep Unsupervised Learning using Nonequilibrium Thermodynamics’, in Proceedings of the 32nd International Conference on Machine Learning, PMLR, Jun. 2015, pp. 2256–2265.
 
 [8] F. Bao et al., ‘All Are Worth Words: A ViT Backbone for Diffusion Models’, presented at the Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, 2023, pp. 22669–22679.
 
-[9] A. Dosovitskiy et al., ‘An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale’, in International Conference on Learning Representations, Oct. 2020. 
+[9] A. Dosovitskiy et al., ‘An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale’, in International Conference on Learning Representations, Oct. 2020.
 
 [10] O. Ronneberger, P. Fischer, and T. Brox, ‘U-Net: Convolutional Networks for Biomedical Image Segmentation’, in International Conference on Medical Image Computing and Computer-Assisted Intervention, N. Navab, J. Hornegger, W. M. Wells, and A. F. Frangi, Eds., Cham: Springer International Publishing, 2015, pp. 234–241.
 
@@ -290,6 +284,6 @@ Course Objectives:
 
 [13] S. Khanna et al., ‘DiffusionSat: A Generative Foundation Model for Satellite Imagery’, in International Conference on Learning Representations (ICLR 2024), Dec. 2023.
 
-[14] R. Gupta et al., ‘xBD: A Dataset for Assessing Building Damage from Satellite Imagery’. arXiv, Nov. 21, 2019. 
+[14] R. Gupta et al., ‘xBD: A Dataset for Assessing Building Damage from Satellite Imagery’. arXiv, Nov. 21, 2019.
 
 [15] J. Ho, A. Jain, and P. Abbeel, ‘Denoising Diffusion Probabilistic Models’, in Advances in Neural Information Processing Systems, Curran Associates, Inc., 2020, pp. 6840–6851.
