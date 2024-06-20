@@ -233,6 +233,7 @@ Right: Building polygons (shown in green) on imagery from Hurricane Michael (201
    <img src="../assets/GBD_Overview.png">
     <p> Overview of our GBD framework.</p>
 </div>
+
 ### Experiments
 
 Course Objectives:
