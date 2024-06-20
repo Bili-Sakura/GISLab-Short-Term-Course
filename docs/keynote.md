@@ -70,11 +70,16 @@
     <img src="../assets/timeline_of_gen.png">
     <p>Progress of deep generative models <a href="https://thudzj.github.io/">[1]</a>.</p>
 </div>
+
 ## Introduction
 
 ### Generation from Scratch
 
-<div align="center"><img src="../assets/illustration_of_cnn.png"></div>
+<div align="center">
+<img src="../assets/vgg.png">
+<img src="../assets/vgg_visualization.png">
+<p>Above: Architecture of VGG <a href="https://www.semanticscholar.org/paper/Very-Deep-Convolutional-Networks-for-Large-Scale-Simonyan-Zisserman/eb42cf88027de515750f230b23b1a057dc782108">[2]</a>. Bottom: The illustration of external and internal behavior of a CNN <a href="https://www.semanticscholar.org/paper/Visualizing-and-Comparing-AlexNet-and-VGG-using-Yu-Yang/dae981902b1f6d869ef2d047612b90cdbe43fd1e">[3]</a>. (VGG team won ILSVRC 2014 <a href="http://arxiv.org/abs/1409.0575">[4]</a> with 1st in localization Task and 2nd in classification task.</p>
+</div>
 
 <div align="center">
 <div style="display: flex; justify-content: center;">
@@ -166,19 +171,23 @@ given the same first pixel value. *</p>
 > <https://www.youtube.com/watch?v=zc5NTeJbk-k>
 
 <div align="center">
-    <img src="../assets/add_noice_full.png">
-    <img src="../assets/denoice_full.png">
-</div>
-<div align="center">
+    <img src="../assets/add_noice_denoise2.png">
+    An illustration of foreward/backward process for denoising diffusion models <a href="https://openreview.net/forum?id=PxTIG12RRHS&utm_campaign=NLP%20News&utm_medium=email&utm_source=Revue%20newsletter">[6]</a>. 
     <img src="../assets/DDPM_algorithm.png">
 Algorithm of denoising diffusion probabilistic models (DDPM) <a href="https://proceedings.neurips.cc/paper/2020/hash/4c5bcfec8584af0d967f1ab10179ca4b-Abstract.html">[15]</a>.
 </div>
+
 
 ## Techniques of Diffusion Models
 
 ### Evolution of Architectures
 
-<div align="center"><img src="../assets/Evolution_of_Architectures.png"></div>
+<div align="center"><img src="../assets/evolution_of_diffusion.png">
+    <p>Left: Architecture of a CNN-based diffusion model <a href="https://proceedings.mlr.press/v37/sohl-dickstein15.html">[7]</a> with training dataset (a) and generation samples (b).</p>
+    <p>Center: Architecture of U-ViT <a href="https://openaccess.thecvf.com/content/CVPR2023/html/Bao_All_Are_Worth_Words_A_ViT_Backbone_for_Diffusion_Models_CVPR_2023_paper.html">[8]</a>.
+</p>
+    <p>Right: Fundemantal archicture of U-ViT. above: ViT <a href="https://openreview.net/forum?id=YicbFdNTTy">[9]</a>; below: U-Net <a href="http://link.springer.com/10.1007/978-3-319-24574-4_28">[10]</a>. </p>
+</div>
 
 ### Conditional Generation
 
