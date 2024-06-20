@@ -26,14 +26,16 @@
   - Generation from Scratch
   - Auto-regression
   - Generalized Auto-regression
+  - Denoising Diffusion
+  - Conditional Generation
   
 - [Why Diffusion Model](#why-diffusion-model)
-- [Diffusion Model in Remote Sensing (RS)]()
+- [Diffusion Model in Remote Sensing (RS)](#diffusion-model-in-remote-sensing)
   - section1
   - section2
   - section3
 
-- [**Practice on Diffusion Models**](#)
+- [**Practice on Diffusion Model**](#practice-on-diffusion-model)
 
 ## Background
 
@@ -69,6 +71,8 @@
 ## Introduction
 
 ### Generation from Scratch
+
+<div align="center"><img src="../assets/illustration_of_cnn.png"></div>
 
 <div align="center">
 <div style="display: flex; justify-content: center;">
@@ -130,13 +134,47 @@ given the same first pixel value. *</p>
     <img src="../assets/similarity_in_image.png">
     <p>It is noted that near pixels are the most strongly related, because they are usaually part of the same object.*</p>
     <img src="../assets/remove_seperately_cases.png">
-    <p>title</p>
+    <p>Remove separate pixels from the image and train a network to predict them (as these pixels are far from each other, we regard them as independent).*
+</p>
 </div>
 
 
+<div align="center">
+    <img src="../assets/video_clip9.gif">
+<p> Remove indepedent pixels graudually (the reversed process is to predict the image).*</p>
+</div>
+
+<div align="center">
+    <img src="../assets/regressor_recover_process_full.png">
+<p> Auto regressor generate images in two steps (add masks & remove masks).*</p>
+</div>
+
+<div align="center">
+    <img src="../assets/PixelCNN_overview.png">
+<p> Illustration of PixelCNN [5].(Left: To generate pixel xi one conditions on all the previously generated pixels left and above of xi. Center: To generate a pixel in the multi-scale case we can also condition on the subsampled image pixels. Right: Diagram of the connectivity inside a masked convolution. In the first layer, each of the RGB channels is connected to previous channels and to the context, but is not connected to itself. In subsequent layers, the channels are also connected to themselves.)</p>
+</div>
 
 > <https://www.youtube.com/watch?v=zc5NTeJbk-k>
+
+### Denoising Diffusion
+
+### Conditional Generation
+
+## Why Diffusion Model
+
+## Diffusion Model in Remote Sensing
+
+
+## Practice on Diffusion Model
 
 ## References
 
 [1] Z. Deng, "扩散模型: 方法与应用" [Advanced Neural Networks, Spring, 2024], Qing Yuan Research Institute, Shanghai Jiao Tong University, 2024.
+
+[2] K. Simonyan and A. Zisserman, ‘Very Deep Convolutional Networks for Large-Scale Image Recognition’, in International Conference on Learning Representations, 2014. 
+
+[3] W. Yu, K. Yang, T. Xiao, H. Yao, and Y. Rui, ‘Visualizing and Comparing AlexNet and VGG using Deconvolutional Layers’, 2016. 
+
+[4] O. Russakovsky et al., ‘ImageNet Large Scale Visual Recognition Challenge’. arXiv, Jan. 29, 2015. 
+
+[5] A. van den Oord, N. Kalchbrenner, and K. Kavukcuoglu, ‘Pixel Recurrent Neural Networks’, in Proceedings of The 33rd International Conference on Machine Learning, PMLR, Jun. 2016, pp. 1747–1756. 
