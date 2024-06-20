@@ -130,7 +130,7 @@ given the same first pixel value. *</p>
 <img src="../assets/average_plausible_results.png">
 <p>Average in pixel value leads to non-sense.*</p>
 <img src="../assets/independent_pixel_prediction.png">
-<p>We can fell free to predict any pixel seperately, if pixel value are statistically independent.*</p>
+<p>We can feel free to predict any pixel seperately, if pixel value is statistically independent.*</p>
     <img src="../assets/similarity_in_image.png">
     <p>It is noted that near pixels are the most strongly related, because they are usaually part of the same object.*</p>
     <img src="../assets/remove_seperately_cases.png">
