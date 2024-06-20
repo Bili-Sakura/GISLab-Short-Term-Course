@@ -286,7 +286,7 @@ Course Objectives:
 
 [11] H. Gao, H. Zhang, Y. Dong, and Z. Deng, ‘Evaluating the Robustness of Text-to-image Diffusion Models against Real-world Attacks’. arXiv, Jun. 15, 2023.
 
-[12] Z. Yu, C. Liu, L. Liu, Z. Shi, and Z. Zou, ‘MetaEarth: A Generative Foundation Model for Global-Scale Remote Sensing Image Generation’. ArXiv. May 28, 2024.
+[12] Z. Yu, C. Liu, L. Liu, Z. Shi, and Z. Zou, ‘MetaEarth: A Generative Foundation Model for Global-Scale Remote Sensing Image Generation’. arXiv. May 28, 2024.
 
 [13] S. Khanna et al., ‘DiffusionSat: A Generative Foundation Model for Satellite Imagery’, in International Conference on Learning Representations (ICLR 2024), Dec. 2023.
 
