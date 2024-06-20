@@ -21,20 +21,20 @@
   - Prosperity of Generative Artificial Intelligence (Gen AI)
 
   - Progress of Deep Generative Models
-
 - [Introduction](#introduction)
   - Generation from Scratch
   - Auto-regression
   - Generalized Auto-regression
   - Denoising Diffusion
+- [Techniques of Diffusion Models](#techniques-of-diffusion-models)
+  - Evolution of Architectures
   - Conditional Generation
-  
-- [Why Diffusion Model](#why-diffusion-model)
+  - Robustness
+
 - [Diffusion Model in Remote Sensing (RS)](#diffusion-model-in-remote-sensing)
   - section1
   - section2
   - section3
-
 - [**Practice on Diffusion Model**](#practice-on-diffusion-model)
 
 ## Background
@@ -154,13 +154,33 @@ given the same first pixel value. *</p>
 <p> Illustration of PixelCNN [5].(Left: To generate pixel xi one conditions on all the previously generated pixels left and above of xi. Center: To generate a pixel in the multi-scale case we can also condition on the subsampled image pixels. Right: Diagram of the connectivity inside a masked convolution. In the first layer, each of the RGB channels is connected to previous channels and to the context, but is not connected to itself. In subsequent layers, the channels are also connected to themselves.)</p>
 </div>
 
+
+
 > <https://www.youtube.com/watch?v=zc5NTeJbk-k>
 
 ### Denoising Diffusion
 
+<div align="center">
+    <img src="../assets/video_clip10.gif">
+<p> Remove information by add noise rather than completely remove pixels.*</p>
+</div>
+
+> <https://www.youtube.com/watch?v=zc5NTeJbk-k>
+
+<div align="center">
+    <img src="../assets/add_noice_full.png">
+    <img src="../assets/denoice_full.png">
+</div>
+
+## Techniques of Diffusion Models
+
+### Evolution of Architectures
+
+<div align="center"><img src="../assets/Evolution_of_Architectures.png"></div>
+
 ### Conditional Generation
 
-## Why Diffusion Model
+### Robustness
 
 ## Diffusion Model in Remote Sensing
 
@@ -178,3 +198,15 @@ given the same first pixel value. *</p>
 [4] O. Russakovsky et al., ‘ImageNet Large Scale Visual Recognition Challenge’. arXiv, Jan. 29, 2015. 
 
 [5] A. van den Oord, N. Kalchbrenner, and K. Kavukcuoglu, ‘Pixel Recurrent Neural Networks’, in Proceedings of The 33rd International Conference on Machine Learning, PMLR, Jun. 2016, pp. 1747–1756. 
+
+[6] Y. Song, J. Sohl-Dickstein, D. P. Kingma, A. Kumar, S. Ermon, and B. Poole, ‘Score-Based Generative Modeling through Stochastic Differential Equations’, presented at the International Conference on Learning Representations, Oct. 2020. 
+
+[7] J. Sohl-Dickstein, E. Weiss, N. Maheswaranathan, and S. Ganguli, ‘Deep Unsupervised Learning using Nonequilibrium Thermodynamics’, in Proceedings of the 32nd International Conference on Machine Learning, PMLR, Jun. 2015, pp. 2256–2265. 
+
+[8] F. Bao et al., ‘All Are Worth Words: A ViT Backbone for Diffusion Models’, presented at the Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, 2023, pp. 22669–22679.
+
+[9] A. Dosovitskiy et al., ‘An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale’, in International Conference on Learning Representations, Oct. 2020. 
+
+[10] O. Ronneberger, P. Fischer, and T. Brox, ‘U-Net: Convolutional Networks for Biomedical Image Segmentation’, in International Conference on Medical Image Computing and Computer-Assisted Intervention, N. Navab, J. Hornegger, W. M. Wells, and A. F. Frangi, Eds., Cham: Springer International Publishing, 2015, pp. 234–241.
+
+[11] H. Gao, H. Zhang, Y. Dong, and Z. Deng, ‘Evaluating the Robustness of Text-to-image Diffusion Models against Real-world Attacks’. arXiv, Jun. 15, 2023.
