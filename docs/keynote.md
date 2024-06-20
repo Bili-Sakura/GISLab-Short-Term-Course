@@ -1,5 +1,6 @@
 # Introduction to Diffusion Models —— GIS Lab 2024 Short-term Course
 
+> [!NOTE]
 > Keynote for "Introduction to Diffusion Models —— GIS Lab 2024 Short-term Course" is available on BaiduNetdisk [here](https://pan.baidu.com/s/1NAZi_NWV3lNLi1rNXhJxhA?pwd=0702).
 
 > Presentor: Sakura (Chen Zhenyuan) M.Eng.
@@ -172,11 +173,10 @@ given the same first pixel value. *</p>
 
 <div align="center">
     <img src="../assets/add_noice_denoise2.png">
-    An illustration of foreward/backward process for denoising diffusion models <a href="https://openreview.net/forum?id=PxTIG12RRHS&utm_campaign=NLP%20News&utm_medium=email&utm_source=Revue%20newsletter">[6]</a>. 
+    An illustration of foreward/backward process for denoising diffusion models <a href="https://openreview.net/forum?id=PxTIG12RRHS&utm_campaign=NLP%20News&utm_medium=email&utm_source=Revue%20newsletter">[6]</a>.
     <img src="../assets/DDPM_algorithm.png">
 Algorithm of denoising diffusion probabilistic models (DDPM) <a href="https://proceedings.neurips.cc/paper/2020/hash/4c5bcfec8584af0d967f1ab10179ca4b-Abstract.html">[15]</a>.
 </div>
-
 
 ## Techniques of Diffusion Models
 
