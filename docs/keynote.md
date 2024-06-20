@@ -33,6 +33,7 @@
 - [**Practice on Diffusion Model**](#practice-on-diffusion-model)
   - Diffusion Model in Remote Sensing (RS)
   - Research Background
+  - Experiments
 
 
 ## Background
@@ -213,6 +214,48 @@ given the same first pixel value. *</p>
 Right: Building polygons (shown in green) on imagery from Hurricane Michael (2018).
 </p>
 </div>
+
+**Abstract**: [Background] Object Detection of Damaged Buildings in disastrous event is important for aiding and reconstruction. [Problem] Current approaches for building damage assessment include CNN-based models and Transformer-based models. However, these pre-trained model is still lack of general capability which fails to timeliness of detection in terms of disastrous events. [Method] In this work, we propose a generative model *ModelName* to manufacture potential post-disaster images from vulnerable regions at global scale, be it Global Building Damage (GBD) dataset. [Result] We find that after further training SOTA models on GBD, the performance of models show great improvements.
+
+<div align="center">
+   <img src="../assets/GBD_Overview.png">
+    <p> Overview of our GBD framework.</p>
+</div>
+### Experiments
+
+Course Objectives:
+
+\1. Learn to use Github for team collaboration
+
+\2. Acquire the ability to configure a deep learning environment on a server
+
+\3. Gain the capability to deploy and run deep learning models (diffusion models) on a server
+
+\4. Understand the basic principles of diffusion models
+
+\5. Become familiar with common remote sensing datasets/data sources
+
+\6. Use the DiffusionSAT model to generate disaster remote sensing images
+
+\7. Attempt to build or run condition-constrained diffusion models to generate pre- and post-disaster remote sensing image pairs
+
+
+
+课程目标：
+
+\1. 学会使用Github进行团队协作
+
+\2. 具备配置服务器深度学习环境的能力
+
+\3. 具备在服务器上部署并运行深度学习模型（扩散模型）的能力
+
+\4. 了解扩散模型的基本原理
+
+\5. 熟悉常用遥感数据集/数据源
+
+\6. 使用DiffusionSAT模型生成灾害遥感影像
+
+\7. 尝试构建或运行具有条件约束的扩散模型以生成灾害前后遥感影像对
 
 ## References
 
