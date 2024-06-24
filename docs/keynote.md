@@ -20,10 +20,10 @@
 ## Outline
 
 - [Background](#background)
-  - [Prosperity of Gen AI: Midjourney](#prosperity-of-gen-ai:-midjourney)
-  - [Prosperity of Gen AI: DALL·E 3](#prosperity-of-gen-ai:-dall·E-3)
-  - [Prosperity of Gen AI: Gen-2](#prosperity-of-gen-ai:-gen-2)
-  - [Prosperity of Gen AI: Pika](#prosperity-of-gen-ai:-pika)
+  - [Prosperity of Gen AI: Midjourney](#prosperity-of-gen-ai-midjourney)
+  - [Prosperity of Gen AI: DALL·E 3](#prosperity-of-gen-ai-dall·E-3)
+  - [Prosperity of Gen AI: Gen-2](#prosperity-of-gen-ai-gen-2)
+  - [Prosperity of Gen AI: Pika](#prosperity-of-gen-ai-pika)
   - [Progress of Deep Generative Models](#progress-of-deep-generative-models)
 - [Introduction](#introduction)
   - [Generation from Scratch](#generation-from-scratch)
