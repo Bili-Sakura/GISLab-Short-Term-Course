@@ -38,8 +38,8 @@
   - [Diffusion Model in Remote Sensing (RS)](#diffusion-model-in-remote-sensing-rs)
   - [Research Background](#research-background)
   - [Experiments](#experiments)
-  - [Advanced Techniques](#advanced-techniques)
-  - [Further Reading](#further-reading)
+  - [Advanced Techniques](#advanced-techniques-optional)
+  - [Further Reading](#further-reading-optional)
 
 
 ## Background
