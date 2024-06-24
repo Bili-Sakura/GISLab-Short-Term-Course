@@ -20,23 +20,27 @@
 ## Outline
 
 - [Background](#background)
-
-  - Prosperity of Generative Artificial Intelligence (Gen AI)
-
-  - Progress of Deep Generative Models
+  - [Prosperity of Gen AI: Midjourney](#prosperity-of-gen-ai:-midjourney)
+  - [Prosperity of Gen AI: DALL·E 3](#prosperity-of-gen-ai:-dall·E-3)
+  - [Prosperity of Gen AI: Gen-2](#prosperity-of-gen-ai:-gen-2)
+  - [Prosperity of Gen AI: Pika](#prosperity-of-gen-ai:-pika)
+  - [Progress of Deep Generative Models](#progress-of-deep-generative-models)
 - [Introduction](#introduction)
-  - Generation from Scratch
-  - Auto-regression
-  - Generalized Auto-regression
-  - Denoising Diffusion
+  - [Generation from Scratch](#generation-from-scratch)
+  - [Auto-regression](#auto-regression)
+  - [Generalized Auto-regression](#generalized-auto-regression)
+  - [Denoising Diffusion](#denoising-diffusion)
 - [Techniques of Diffusion Models](#techniques-of-diffusion-models)
-  - Evolution of Architectures
-  - Conditional Generation
-  - Robustness
-- [**Practice on Diffusion Model**](#practice-on-diffusion-model)
-  - Diffusion Model in Remote Sensing (RS)
-  - Research Background
-  - Experiments
+  - [Evolution of Architectures](#evolution-of-architectures)
+  - [Conditional Generation](#conditional-generation)
+  - [Robustness](#robustness)
+- [Practice on Diffusion Model](#practice-on-diffusion-model)
+  - [Diffusion Model in Remote Sensing (RS)](#diffusion-model-in-remote-sensing-rs)
+  - [Research Background](#research-background)
+  - [Experiments](#experiments)
+  - [Advanced Techniques](#advanced-techniques)
+  - [Further Reading](#further-reading)
+
 
 ## Background
 
@@ -268,6 +272,23 @@ Course Objectives:
 
 \7. 尝试构建或运行具有条件约束的扩散模型以生成灾害前后遥感影像对
 
+### Advanced Techniques (optional)
+
+![image-20240624102500958](../assets/controlnet_architecture.png)
+
+![image-20240624102732425](../assets/controlnet_sd_demos.png)
+
+<div align="center">Above: Architecture of ControlNet <a href="https://ieeexplore.ieee.org/document/10377881/media">[16]</a> on Stable Diffusion <a href="https://openaccess.thecvf.com/content/CVPR2022/html/Rombach_High-Resolution_Image_Synthesis_With_Latent_Diffusion_Models_CVPR_2022_paper.html">[17]</a>. Below: Controlling Stable Diffusion with ADE20K <a href="https://openaccess.thecvf.com/content_cvpr_2017/html/Zhou_Scene_Parsing_Through_CVPR_2017_paper.html">[18]</a> segmentation map. All results are achieved with default prompt. (Stable Diffusion’s U-net architecture connected with a ControlNet on the encoder blocks and middle block. The locked, gray blocks show the structure of Stable Diffusion V1.5 (or V2.1, as they use the same U-net architecture). The trainable blue blocks and the white zero convolution layers are added to build a ControlNet.)</div>
+
+### Further Reading
+
+![image-20240624103422478](../assets/arXiv_he.png)
+
+<div align="center">Left: Autoregressive image generation adopts Diffusion Loss <a href="http://arxiv.org/abs/2406.11838">[19]</a>. (published on arXiv, June 17, 2024) Right: Profile of Kaiming He (何恺明).* (Associate Professor, EECS, MIT)
+</div>
+
+> https://people.csail.mit.edu/kaiming/
+
 ## References
 
 [1] Z. Deng, "扩散模型: 方法与应用" [Advanced Neural Networks, Spring, 2024], Qing Yuan Research Institute, Shanghai Jiao Tong University, 2024.
@@ -299,3 +320,11 @@ Course Objectives:
 [14] R. Gupta et al., ‘xBD: A Dataset for Assessing Building Damage from Satellite Imagery’. arXiv, Nov. 21, 2019.
 
 [15] J. Ho, A. Jain, and P. Abbeel, ‘Denoising Diffusion Probabilistic Models’, in Advances in Neural Information Processing Systems, Curran Associates, Inc., 2020, pp. 6840–6851.
+
+[16] L. Zhang, A. Rao, and M. Agrawala, ‘Adding Conditional Control to Text-to-Image Diffusion Models’, in 2023 IEEE/CVF International Conference on Computer Vision (ICCV), Oct. 2023, pp. 3813–3824..
+
+[17] R. Rombach, A. Blattmann, D. Lorenz, P. Esser, and B. Ommer, ‘High-Resolution Image Synthesis With Latent Diffusion Models’, presented at the Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, 2022, pp. 10684–10695.
+
+[18] B. Zhou, H. Zhao, X. Puig, S. Fidler, A. Barriuso, and A. Torralba, ‘Scene Parsing Through ADE20K Dataset’, presented at the Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, 2017, pp. 633–641. 
+
+[19] T. Li, Y. Tian, H. Li, M. Deng, and K. He, ‘Autoregressive Image Generation without Vector Quantization’. Jun. 17, 2024. 
