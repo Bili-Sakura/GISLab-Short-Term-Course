@@ -242,35 +242,35 @@ Right: Building polygons (shown in green) on imagery from Hurricane Michael (201
 
 Course Objectives:
 
-\1. Learn to use Github for team collaboration
+\1. Use GitHub and Overleaf for collaboration
 
-\2. Acquire the ability to configure a deep learning environment on a server
+\2. Configure a deep learning environment on a server
 
-\3. Gain the capability to deploy and run deep learning models (diffusion models) on a server
+\3. Deploy and run deep learning models on a server
 
 \4. Understand the basic principles of diffusion models
 
-\5. Become familiar with common remote sensing datasets/data sources
+\5. Get to know common remote sensing datasets/data sources
 
-\6. Use the DiffusionSAT model to generate disaster remote sensing images
+\6. Capture the world's major urban areas using appropriate methodologies/models
 
-\7. Attempt to build or run condition-constrained diffusion models to generate pre- and post-disaster remote sensing image pairs
+\7. Adopt ControlNet as backbonn, pre-train ControlNet on disaster remote sensing images and yield a remote sensing specialized conditional diffusion model
 
 课程目标：
 
-\1. 学会使用Github进行团队协作
+\1. 学会使用GitHub和Overleaf进行团队协作
 
 \2. 具备配置服务器深度学习环境的能力
 
-\3. 具备在服务器上部署并运行深度学习模型（扩散模型）的能力
+\3. 具备在服务器上部署并运行深度学习模型的能力
 
 \4. 了解扩散模型的基本原理
 
 \5. 熟悉常用遥感数据集/数据源
 
-\6. 使用DiffusionSAT模型生成灾害遥感影像
+\6. 使用合适的方法/模型，获取全球主要城市区域
 
-\7. 尝试构建或运行具有条件约束的扩散模型以生成灾害前后遥感影像对
+\7. 使用[ControlNet](https://github.com/lllyasviel/ControlNet)模型*作为骨架网络，使用灾害场景遥感数据集进行预训练得到专职于生成遥感灾害图像对的具有条件控制能力的扩散模型
 
 ### Advanced Techniques (optional)
 
@@ -288,6 +288,10 @@ Course Objectives:
 </div>
 
 > https://people.csail.mit.edu/kaiming/
+
+### Assignment
+
+ControlNet -> (pre-training on RS Images) -> ControlNet4RSI
 
 ## References
 
