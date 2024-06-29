@@ -41,7 +41,6 @@
   - [Advanced Techniques](#advanced-techniques-optional)
   - [Further Reading](#further-reading-optional)
 
-
 ## Background
 
 ### Prosperity of Gen AI: Midjourney
@@ -234,7 +233,7 @@ Right: Building polygons (shown in green) on imagery from Hurricane Michael (201
 **Abstract**: [Background] Object Detection of Damaged Buildings in disastrous event is important for aiding and reconstruction. [Problem] Current approaches for building damage assessment include CNN-based models and Transformer-based models. However, these pre-trained model is still lack of general capability which fails to timeliness of detection in terms of disastrous events. [Method] In this work, we propose a generative model *ModelName* to manufacture potential post-disaster images from vulnerable regions at global scale, be it Global Building Damage (GBD) dataset. [Result] We find that after further training SOTA models on GBD, the performance of models show great improvements.
 
 <div align="center">
-   <img src="../assets/GBD_Overview.png">
+   <img src="../assets/Overview0629.png">
     <p> Overview of our GBD framework.</p>
 </div>
 
@@ -287,7 +286,7 @@ Course Objectives:
 <div align="center">Left: Autoregressive image generation adopts Diffusion Loss <a href="http://arxiv.org/abs/2406.11838">[19]</a>. (published on arXiv, June 17, 2024) Right: Profile of Kaiming He (何恺明).* (Associate Professor, EECS, MIT)
 </div>
 
-> https://people.csail.mit.edu/kaiming/
+> <https://people.csail.mit.edu/kaiming/>
 
 ### Assignment
 
@@ -329,6 +328,6 @@ ControlNet -> (pre-training on RS Images) -> ControlNet4RSI
 
 [17] R. Rombach, A. Blattmann, D. Lorenz, P. Esser, and B. Ommer, ‘High-Resolution Image Synthesis With Latent Diffusion Models’, presented at the Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, 2022, pp. 10684–10695.
 
-[18] B. Zhou, H. Zhao, X. Puig, S. Fidler, A. Barriuso, and A. Torralba, ‘Scene Parsing Through ADE20K Dataset’, presented at the Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, 2017, pp. 633–641. 
+[18] B. Zhou, H. Zhao, X. Puig, S. Fidler, A. Barriuso, and A. Torralba, ‘Scene Parsing Through ADE20K Dataset’, presented at the Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, 2017, pp. 633–641.
 
-[19] T. Li, Y. Tian, H. Li, M. Deng, and K. He, ‘Autoregressive Image Generation without Vector Quantization’. Jun. 17, 2024. 
+[19] T. Li, Y. Tian, H. Li, M. Deng, and K. He, ‘Autoregressive Image Generation without Vector Quantization’. Jun. 17, 2024.
