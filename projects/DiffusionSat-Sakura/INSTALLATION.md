@@ -10,3 +10,6 @@ pip install torch==2.2.2 torchvision==0.17.2 --index-url https://download.pytorc
 pip install -e ".[torch]"  # install editable diffusers
 pip install -r remaining_requirements.txt
 ```
+
+
+# qxktest
