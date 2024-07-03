@@ -14,7 +14,7 @@ To-do List:
 
 - [ ] GitHub Collaboration & Overleaf Collaboration (optional)
 
-- [ ] Understand General Project Purpose and Pipeline (see [here](./docs/pipeline.md))
+- [x] Understand General Project Purpose and Pipeline (see [here](./docs/pipeline.md))
 - [ ] Set up the environment of  [DiffusionSAT](https://github.com/samar-khanna/DiffusionSat)
 
 ### July<sup>4th</sup>
