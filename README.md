@@ -8,7 +8,7 @@ Keynote(.pptx) download link [here](https://pan.baidu.com/s/1NAZi_NWV3lNLi1rNXhJ
 
 ## Agenda & Discussion Board
 
-### July<sup> 3rd</sup>
+### July<sup>3rd</sup>
 
 To-do List:
 
@@ -37,4 +37,4 @@ Problems and Solutions:
 To-do List:
 
 - [ ] Set up the environment of  [DiffusionSAT](https://github.com/samar-khanna/DiffusionSat), [Stable Diffusion](https://github.com/CompVis/stable-diffusion) and [ControlNet](https://github.com/lllyasviel/ControlNet) respectively
-- [ ] Get to know the heating dataset (e.g. [xBD](https://xview2.org/dataset)) 
+- [ ] Get to know the heating dataset (e.g. [xBD](https://xview2.org/dataset))
