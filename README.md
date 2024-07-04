@@ -19,14 +19,14 @@ To-do List:
 
 Problems and Solutions:
 
-- [ ] Cuda Out of Memory (details see [here](./discussion.md#74-syt))
+- [x] Cuda Out of Memory (details see [here](./discussion.md#74-syt))
   1. Check whether already use GPU, if true, turn to `step2`.
   2. Compared the total memory of your GPU and the desired memory of the project. If the desired one exceeds the local capability, turn `step3`.
   3. Deploy the project on the GPU clusters from GISLab. First, make sure you are confident with what you are going to do with this project as well as the experinments in mind. Then, I will ask the administrator to register the cluster for me. Finally, regarding the deployment on a cluster server, ask the TA. Liang for details.
 
 To-do List:
 
-- [ ] Prepare Presentation on `Project Understanding and Experiment Design` for the next day (July 5th)
+- [x] Prepare Presentation on `Project Understanding and Experiment Design` for the next day (July 5th)
 
 ### July<sup>5th</sup>
 
