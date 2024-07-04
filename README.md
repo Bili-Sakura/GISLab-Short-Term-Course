@@ -12,10 +12,8 @@ Keynote(.pptx) download link [here](https://pan.baidu.com/s/1NAZi_NWV3lNLi1rNXhJ
 
 To-do List:
 
-- [ ] GitHub Collaboration & Overleaf Collaboration (optional)
-
+- [x] GitHub Collaboration & Overleaf Collaboration (optional)
 - [x] Understand General Project Purpose and Pipeline (see [here](./docs/pipeline.md))
-- [ ] Set up the environment of  [DiffusionSAT](https://github.com/samar-khanna/DiffusionSat)
 
 ### July<sup>4th</sup>
 
@@ -25,5 +23,5 @@ Problems:
 
 To-do List:
 
-- [ ] Prepare Presentation on `Project Understanding and Experiment Design` for the next day (July 5th) 
-####
+- [ ] Prepare Presentation on `Project Understanding and Experiment Design` for the next day (July 5th)
+- [ ] Set up the environment of  [DiffusionSAT](https://github.com/samar-khanna/DiffusionSat)
