@@ -87,16 +87,23 @@ Existing diffusion-based image generation models are primarily trained on **natu
 
 1. **Generative Foundation Model for Satellite Imagery**
    - We propose a novel generative foundation model for satellite image data with the ability to generate high-resolution satellite imagery from **numerical metadata** as well as text.
+   
 2. **3D Conditioning Extension**
    - We design a novel **3D-conditioning extension** which enables DiffusionSat to demonstrate state-of-the-art performance on super-resolution, temporal generation, and in-painting.
+   
 3. **Large-Scale Training Dataset**
    - We collect and compile a global generative pre-training dataset from large, publicly available satellite image datasets.
 
-1. **针对卫星图像的生成基础模型**
+   **针对卫星图像的生成基础模型**
+   
    - 本文提出了一种新的生成基础模型，该模型能够从**数值元数据**和文本生成高分辨率的卫星图像 。
-2. **3D 条件扩展**
+   
+   **3D 条件扩展**
+   
    - 本文设计了一种新的 **3D 条件扩展**，使 DiffusionSat 在超分辨率、时序生成和修复等任务中表现出最先进的性能。
-3. **大规模训练数据集**
+   
+   **大规模训练数据集**
+   
    - 本文从大量公开的卫星图像数据集中收集和编制了一个全球尺度用于生成式预训练的遥感图像数据集。
 
 #### Dataset 预处理和微调数据集
