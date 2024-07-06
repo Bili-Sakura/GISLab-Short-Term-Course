@@ -35,15 +35,24 @@ Problems and Solutions:
 - [x] Suggestions given by Prof. Zhang
 
 1. Estimate the model performance for current models ✔
-   
+
 2. Pay attention to labeled data ✔
 
 To-do List:
 
-- [ ] Set up the environment of  [DiffusionSAT](https://github.com/samar-khanna/DiffusionSat), [Stable Diffusion](https://github.com/CompVis/stable-diffusion) and [ControlNet](https://github.com/lllyasviel/ControlNet) respectively
 - [x] Get to know the heating dataset (e.g. [xBD](https://xview2.org/dataset))
 
 ### July<sup>6th</sup>
+
+Problems and Solutions:
+
+- [x] Network Error with Server Cluster
+
+To-do List:
+
+- [x] Read the work of [DiffusionSAT](readings\RS\Khanna et al_2023_DiffusionSat.pdf) carefully on `research background`, `pretraining and fine-tuning dataset` ,`model architecture` and `evaluation` （see [notes](./discussion.md#76sakura)）
+
+### July<sup>7th</sup>
 
 Problems and Solutions:
 
@@ -51,5 +60,9 @@ Problems and Solutions:
 
 To-do List:
 
+- [ ] Prepare Presentation for the next day (July 8th)
+  - display samples generate by Stable Diffusion
+  - display samples generate by DiffusionSAT
+  - compare their difference with same prompt in naive way
+  - discuss the future evaluation **metrics**
 - [ ] Set up the environment of  [DiffusionSAT](https://github.com/samar-khanna/DiffusionSat), [Stable Diffusion](https://github.com/CompVis/stable-diffusion) and [ControlNet](https://github.com/lllyasviel/ControlNet) respectively
-- [ ] Read the work of [DiffusionSAT](readings\RS\Khanna et al_2023_DiffusionSat.pdf) carefully on `research backgound`, `pretraining and fine-tuning dataset` ,`model architecture` and `evaluation`
