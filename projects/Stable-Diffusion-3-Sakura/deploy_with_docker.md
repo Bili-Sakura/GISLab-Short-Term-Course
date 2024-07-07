@@ -44,7 +44,3 @@ ENV NAME World
     ```sh
     docker run -p 4000:80 sd3-inference
     ```
-
-This Dockerfile sets up the necessary environment, installs dependencies, downloads the required model weights, and runs the inference script with a specified prompt. Make sure to replace `"URL_TO_*_WEIGHTS"` with the actual URLs for the model weights.
-
-This setup ensures compatibility with the recommended Python version and facilitates a streamlined deployment process.
