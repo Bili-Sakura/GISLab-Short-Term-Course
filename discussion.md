@@ -87,23 +87,23 @@ Existing diffusion-based image generation models are primarily trained on **natu
 
 1. **Generative Foundation Model for Satellite Imagery**
    - We propose a novel generative foundation model for satellite image data with the ability to generate high-resolution satellite imagery from **numerical metadata** as well as text.
-   
+
 2. **3D Conditioning Extension**
    - We design a novel **3D-conditioning extension** which enables DiffusionSat to demonstrate state-of-the-art performance on super-resolution, temporal generation, and in-painting.
-   
+
 3. **Large-Scale Training Dataset**
    - We collect and compile a global generative pre-training dataset from large, publicly available satellite image datasets.
 
    **针对卫星图像的生成基础模型**
-   
+
    - 本文提出了一种新的生成基础模型，该模型能够从**数值元数据**和文本生成高分辨率的卫星图像 。
-   
+
    **3D 条件扩展**
-   
+
    - 本文设计了一种新的 **3D 条件扩展**，使 DiffusionSat 在超分辨率、时序生成和修复等任务中表现出最先进的性能。
-   
+
    **大规模训练数据集**
-   
+
    - 本文从大量公开的卫星图像数据集中收集和编制了一个全球尺度用于生成式预训练的遥感图像数据集。
 
 #### Dataset 预处理和微调数据集
@@ -196,12 +196,279 @@ DiffusionSat 的性能通过多种指标和任务进行了评估，以展示其�
 
 ![](assets/discussion-img/evaluation_of_diffusionsat.png)
 
-> FID指标见论文 Heusel, M., Ramsauer, H., Unterthiner, T., Nessler, B., & Hochreiter, S. (2017). GANs Trained by a Two Time-Scale Update Rule Converge to a Local Nash Equilibrium. *Advances in Neural Information Processing Systems*, *30*. https://proceedings.neurips.cc/paper/2017/hash/8a1d694707eb0fefe65871369074926d-Abstract.html
+> FID指标见论文 Heusel, M., Ramsauer, H., Unterthiner, T., Nessler, B., & Hochreiter, S. (2017). GANs Trained by a Two Time-Scale Update Rule Converge to a Local Nash Equilibrium. *Advances in Neural Information Processing Systems*, *30*. <https://proceedings.neurips.cc/paper/2017/hash/8a1d694707eb0fefe65871369074926d-Abstract.html>
 
 #### References 参考文献
 
-Khanna, S., Liu, P., Zhou, L., Meng, C., Rombach, R., Burke, M., Lobell, D. B., & Ermon, S. (2023). *DiffusionSat: A Generative Foundation Model for Satellite Imagery*. Published as a conference paper at ICLR 2024. 
+Khanna, S., Liu, P., Zhou, L., Meng, C., Rombach, R., Burke, M., Lobell, D. B., & Ermon, S. (2023). *DiffusionSat: A Generative Foundation Model for Satellite Imagery*. Published as a conference paper at ICLR 2024.
 
-Heusel, M., Ramsauer, H., Unterthiner, T., Nessler, B., & Hochreiter, S. (2017). GANs Trained by a Two Time-Scale Update Rule Converge to a Local Nash Equilibrium. *Advances in Neural Information Processing Systems*, *30*. https://proceedings.neurips.cc/paper/2017/hash/8a1d694707eb0fefe65871369074926d-Abstract.html
+Heusel, M., Ramsauer, H., Unterthiner, T., Nessler, B., & Hochreiter, S. (2017). GANs Trained by a Two Time-Scale Update Rule Converge to a Local Nash Equilibrium. *Advances in Neural Information Processing Systems*, *30*. <https://proceedings.neurips.cc/paper/2017/hash/8a1d694707eb0fefe65871369074926d-Abstract.html>
 
 ---
+
+## 7/7@sakura
+
+> [!CAUTION]
+> ChatGPT can make mistakes.
+
+### Notes for FID
+
+> Heusel, M., Ramsauer, H., Unterthiner, T., Nessler, B., & Hochreiter, S. (2017). GANs Trained by a Two Time-Scale Update Rule Converge to a Local Nash Equilibrium. *Advances in Neural Information Processing Systems*, *30*. <https://proceedings.neurips.cc/paper/2017/hash/8a1d694707eb0fefe65871369074926d-Abstract.html>
+
+> [!NOTE]
+> This note is in assistant with gpt-4o by Sakura.
+
+Fréchet Inception Distance（FID）是一个用于评估生成图像质量的新指标。与之前的Inception Score相比，FID更能够捕捉生成图像与真实图像之间的相似性。
+
+以下是FID的主要特点和用途：
+
+1. **指标原理**：
+   - FID通过比较生成图像与真实图像在某个预训练的Inception网络编码层中的分布来评估图像质量。
+   - 它假设这些编码层的输出是多维高斯分布，然后计算生成图像和真实图像之间的Fréchet距离（也称Wasserstein-2距离）。
+
+2. **计算方法**：
+   - 通过Inception网络的编码层提取生成图像和真实图像的特征。
+   - 计算这些特征的均值和协方差矩阵。
+   - FID通过这些均值和协方差矩阵计算两组特征之间的Fréchet距离。
+
+3. **用途**：
+   - FID用于评估生成的图像质量，量化生成图像与真实图像在视觉特征上的相似性。
+   - 一个较低的FID值表示生成的图像与真实图像更为相似，质量更高。
+   - FID在图像生成的各种实验中广泛应用，包括人脸图像生成、自然图像生成等。
+
+通过这种方式，FID能够提供一个更加一致和可靠的评估标准，比单纯依赖Inception Score更能反映图像生成模型的性能。
+
+![](assets/discussion-img/FID_demos.png)
+
+#### FID代码实现
+
+常用的FID计算工具是`pytorch-fid`，它适用于PyTorch用户。你可以通过以下步骤安装和使用：
+
+1. **安装依赖包**：
+
+```bash
+pip install pytorch-fid
+```
+
+2. **计算FID**：
+
+```python
+from pytorch_fid import fid_score
+
+# 生成图像和真实图像所在的文件夹路径
+path_to_real_images = 'path/to/real_images'
+path_to_generated_images = 'path/to/generated_images'
+
+# 计算FID
+fid = fid_score.calculate_fid_given_paths([path_to_real_images, path_to_generated_images], batch_size=50, device='cuda', dims=2048)
+
+print('FID:', fid)
+```
+
+### SSIM代码实现
+
+> Genereted by gpt-4o.
+
+SSIM是一种衡量图像相似度的指标，可以直接使用`scikit-image`库中的`ssim`函数，也可以使用自定义的PyTorch实现。这里展示的是自定义的PyTorch实现。
+
+1. **安装依赖库**：
+
+```bash
+pip install torch torchvision scikit-image
+```
+
+2. **计算SSIM的代码**：
+
+```python
+import torch
+import torch.nn.functional as F
+from torch.autograd import Variable
+import numpy as np
+
+def gaussian(window_size, sigma):
+    gauss = torch.Tensor([np.exp(-(x - window_size//2)**2/float(2*sigma**2)) for x in range(window_size)])
+    return gauss/gauss.sum()
+
+def create_window(window_size, channel):
+    _1D_window = gaussian(window_size, 1.5).unsqueeze(1)
+    _2D_window = _1D_window.mm(_1D_window.t()).float().unsqueeze(0).unsqueeze(0)
+    window = Variable(_2D_window.expand(channel, 1, window_size, window_size).contiguous())
+    return window
+
+def ssim(img1, img2, window_size=11, val_range=255):
+    L = val_range  # L is the dynamic range of the pixel values (255 for 8-bit grayscale images)
+
+    padd = 0
+    (_, channel, _, _) = img1.size()
+    window = create_window(window_size, channel)
+
+    mu1 = F.conv2d(img1, window, padding=padd, groups=channel)
+    mu2 = F.conv2d(img2, window, padding=padd, groups=channel)
+
+    mu1_sq = mu1.pow(2)
+    mu2_sq = mu2.pow(2)
+    mu1_mu2 = mu1 * mu2
+
+    sigma1_sq = F.conv2d(img1 * img1, window, padding=padd, groups=channel) - mu1_sq
+    sigma2_sq = F.conv2d(img2 * img2, window, padding=padd, groups=channel) - mu2_sq
+    sigma12 = F.conv2d(img1 * img2, window, padding=padd, groups=channel) - mu1_mu2
+
+    C1 = (0.01 * L) ** 2
+    C2 = (0.03 * L) ** 2
+
+    ssim_map = ((2 * mu1_mu2 + C1) * (2 * sigma12 + C2)) / ((mu1_sq + mu2_sq + C1) * (sigma1_sq + sigma2_sq + C2))
+    return ssim_map.mean()
+
+# Example usage
+img1 = torch.rand(1, 1, 256, 256) * 255
+img2 = torch.rand(1, 1, 256, 256) * 255
+
+print('SSIM:', ssim(img1, img2).item())
+```
+
+当然，下面是使用PyTorch计算PSNR（峰值信噪比）的完整代码。
+
+### PSNR代码实现
+
+PSNR是一种用于衡量图像质量的指标，通常用于评估压缩图像与原始图像之间的差异。它的计算方法基于图像的均方误差（MSE）。
+
+1. **安装依赖库**：
+
+```bash
+pip install torch torchvision
+```
+
+2. **计算PSNR的代码**：
+
+```python
+import torch
+
+def psnr(img1, img2):
+    """
+    Compute the Peak Signal-to-Noise Ratio (PSNR) between two images.
+    Args:
+        img1, img2: PyTorch tensors of shape (1, 1, H, W) with pixel values in range [0, 255].
+    Returns:
+        PSNR value in dB.
+    """
+    mse = torch.mean((img1 - img2) ** 2)
+    if mse == 0:
+        return float('inf')
+    max_pixel = 255.0
+    psnr_value = 20 * torch.log10(max_pixel / torch.sqrt(mse))
+    return psnr_value
+
+# Example usage
+img1 = torch.rand(1, 1, 256, 256) * 255  # Example tensor for image 1
+img2 = torch.rand(1, 1, 256, 256) * 255  # Example tensor for image 2
+
+print('PSNR:', psnr(img1, img2).item())
+```
+
+> #### 代码解释
+>
+> 1. **psnr函数**：
+>    - 该函数接收两个PyTorch张量`img1`和`img2`，它们的形状为(1, 1, H, W)，表示单通道（灰度）图像，像素值范围为[0, 255]。
+>    - 计算图像之间的均方误差（MSE）。
+>    - 通过MSE计算PSNR值，公式为：$$ \text{PSNR} = 20 \cdot \log_{10}\left(\frac{\text{MAX}_{\text{pixel}}}{\sqrt{\text{MSE}}}\right) $$，其中MAX_pixel通常为255。
+>
+> 2. **Example usage**：
+>    - 生成两个随机的示例图像张量`img1`和`img2`。
+>    - 计算并打印这两个图像的PSNR值。
+>
+
+### Note for CLIP
+
+> Radford, A., Kim, J. W., Hallacy, C., Ramesh, A., Goh, G., Agarwal, S., Sastry, G., Askell, A., Mishkin, P., Clark, J., Krueger, G., & Sutskever, I. (2021). Learning Transferable Visual Models From Natural Language Supervision. *Proceedings of the 38th International Conference on Machine Learning*, 8748–8763. <https://proceedings.mlr.press/v139/radford21a.html>
+
+> [!NOTE]
+>
+> This note is generated in assistant with gpt-4o by Sakura.
+
+CLIP（Contrastive Language-Image Pre-training）模型是一种基于对比学习的多模态模型，旨在通过自然语言监督学习图像表示。CLIP模型包括一个图像编码器和一个文本编码器，分别使用ResNet或Vision Transformer（ViT）架构和12层的Transformer架构。预训练数据集由4亿对图像和文本对组成，称为WebImageText（WIT），这些数据对从互联网上收集。模型通过一个对比学习目标进行训练，以最大化正确图像-文本对的余弦相似度，同时最小化错误对的相似度。CLIP能够零样本迁移到多个下游任务，包括图像分类、OCR、地理定位和动作识别，在这些任务上，CLIP展示了与完全监督基线模型相当甚至更优的性能。其具体应用包括通过自然语言描述来生成图像分类器，提供灵活且无需任务特定训练数据的解决方案。
+
+![](assets/discussion-img/CLIP_overview.png)
+
+CLIP-Score是一种通过OpenAI的CLIP模型计算图像和文本匹配度的指标。它通过分别编码图像和文本为特征向量，然后计算它们之间的余弦相似度来评估图像与文本描述之间的相关性。高CLIP-Score表示图像与文本描述高度匹配，常用于图像描述生成、图像检索等领域，帮助评估生成模型或检索系统的性能。
+
+CLIP-Score代码实现
+
+下面是用Python和PyTorch实现计算CLIP-Score的代码。
+
+首先，你需要安装必要的库。如果你还没有安装，可以使用以下命令来安装：
+
+```bash
+pip install torch torchvision clip-by-openai
+```
+
+以下是一个示例代码，用于计算图像和文本对的CLIP-Score：
+
+```python
+import torch
+import clip
+from PIL import Image
+
+# 加载CLIP模型和预训练的权重
+device = "cuda" if torch.cuda.is_available() else "cpu"
+model, preprocess = clip.load("ViT-B/32", device=device)
+
+def compute_clip_score(image_path, text):
+    # 加载图像并预处理
+    image = preprocess(Image.open(image_path)).unsqueeze(0).to(device)
+    
+    # 编码图像和文本
+    with torch.no_grad():
+        image_features = model.encode_image(image)
+        text_features = model.encode_text(clip.tokenize([text]).to(device))
+    
+    # 计算余弦相似度
+    image_features /= image_features.norm(dim=-1, keepdim=True)
+    text_features /= text_features.norm(dim=-1, keepdim=True)
+    similarity = (image_features @ text_features.T).item()
+    
+    return similarity
+
+# 示例使用
+image_path = "path/to/your/image.jpg"
+text_description = "A description of the image"
+clip_score = compute_clip_score(image_path, text_description)
+print(f"CLIP-Score: {clip_score}")
+```
+
+> ### 代码解释
+>
+> 1. **加载CLIP模型和预处理器**：
+>
+>    ```python
+>    model, preprocess = clip.load("ViT-B/32", device=device)
+>    ```
+>
+>    这行代码加载了预训练的CLIP模型（Vision Transformer架构）和图像预处理器。
+>
+> 2. **预处理图像**：
+>
+>    ```python
+>    image = preprocess(Image.open(image_path)).unsqueeze(0).to(device)
+>    ```
+>
+>    这段代码打开并预处理输入图像，将其转换为适合模型输入的格式。
+>
+> 3. **编码图像和文本**：
+>
+>    ```python
+>    with torch.no_grad():
+>        image_features = model.encode_image(image)
+>        text_features = model.encode_text(clip.tokenize([text]).to(device))
+>    ```
+>
+>    使用模型分别编码图像和文本，得到它们的特征向量。
+>
+> 4. **计算余弦相似度**：
+>
+>    ```python
+>    image_features /= image_features.norm(dim=-1, keepdim=True)
+>    text_features /= text_features.norm(dim=-1, keepdim=True)
+>    similarity = (image_features @ text_features.T).item()
+>    ```
+>
+>    将特征向量归一化后，计算它们之间的余弦相似度。这个相似度就是CLIP-Score。

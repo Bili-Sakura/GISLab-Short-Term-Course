@@ -65,4 +65,13 @@ To-do List:
   - display samples generate by DiffusionSAT
   - compare their difference with same prompt in naive way
   - discuss the future evaluation **metrics**
+
+### July<sup>8th</sup>
+
+Problems and Solutions:
+
+- [ ] ...
+
+To-do List:
+
 - [ ] Set up the environment of  [DiffusionSAT](https://github.com/samar-khanna/DiffusionSat), [Stable Diffusion](https://github.com/CompVis/stable-diffusion) and [ControlNet](https://github.com/lllyasviel/ControlNet) respectively
