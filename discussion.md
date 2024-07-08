@@ -439,9 +439,10 @@ print(f"CLIP-Score: {clip_score}")
 >
 > 1. **加载CLIP模型和预处理器**：
 >
->    ```python
->    model, preprocess = clip.load("ViT-B/32", device=device)
->    ```
+>    > ```python
+>    > model, preprocess = clip.load("ViT-B/32", device=device)
+>    > ```
+>    >
 >
 >    这行代码加载了预训练的CLIP模型（Vision Transformer架构）和图像预处理器。
 >
@@ -472,3 +473,46 @@ print(f"CLIP-Score: {clip_score}")
 >    ```
 >
 >    将特征向量归一化后，计算它们之间的余弦相似度。这个相似度就是CLIP-Score。
+>
+
+## 7/8@Sakura
+
+### Introduction to Stable Diffusion Series Model
+
+Progress: Stable Diffusion v1-v1.5 -> Stable Diffusion v2 -> Stable Diffusion XL -> Stable Diffusion XL Turbo -> Stable Diffusion 3
+
+#### Stable Diffusion v1-v1.5
+
+> Rombach, R., Blattmann, A., Lorenz, D., Esser, P., & Ommer, B. (2022). High-Resolution Image Synthesis With Latent Diffusion Models. 10684–10695. <https://openaccess.thecvf.com/content/CVPR2022/html/Rombach_High-Resolution_Image_Synthesis_With_Latent_Diffusion_Models_CVPR_2022_paper.html>
+
+[Paper](./readings/Stable_Diffusion/Rombach%20et%20al_2022_High-Resolution%20Image%20Synthesis%20With%20Latent%20Diffusion%20Models.pdf)
+
+[Code](https://github.com/CompVis/stable-diffusion)
+
+#### Stable Diffusion v2
+
+> Blog only
+
+[Code](https://github.com/Stability-AI/stablediffusion)
+
+#### Stable Diffusion XL
+
+> Podell, D., English, Z., Lacey, K., Blattmann, A., Dockhorn, T., Müller, J., Penna, J., & Rombach, R. (2023, October 13). SDXL: Improving Latent Diffusion Models for High-Resolution Image Synthesis. The Twelfth International Conference on Learning Representations. <https://openreview.net/forum?id=di52zR8xgf>
+
+[Paper](./readings/Stable_Diffusion_XL/Podell%20et%20al.%20-%202023%20-%20SDXL%20Improving%20Latent%20Diffusion%20Models%20for%20High-R.pdf)
+
+[Code](https://github.com/Stability-AI/generative-models)
+
+#### Stable Diffusion XL Turbo
+
+> Sauer, A., Lorenz, D., Blattmann, A., & Rombach, R. (n.d.). Adversarial Diffusion Distillation.
+
+[Technical Report](./readings/Stbale_Diffusion_XL_Turbo/Sauer%20et%20al.%20-%20Adversarial%20Diffusion%20Distillation.pdf)
+
+[Code](https://github.com/Stability-AI/generative-models)
+
+#### Stable Diffusion 3
+
+> Esser, P., Kulal, S., Blattmann, A., Entezari, R., Müller, J., Saini, H., Levi, Y., Lorenz, D., Sauer, A., Boesel, F., Podell, D., Dockhorn, T., English, Z., & Rombach, R. (2024, June 6). Scaling Rectified Flow Transformers for High-Resolution Image Synthesis. Forty-first International Conference on Machine Learning. <https://openreview.net/forum?id=FPnUhsQJ5B>
+
+[Paper](./readings/Stable_Diffusion_3/Esser%20et%20al_2024_Scaling%20Rectified%20Flow%20Transformers%20for%20High-Resolution%20Image%20Synthesis.pdf)
