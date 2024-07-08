@@ -10,12 +10,22 @@ Note: this repo is an early reference lib meant to assist partner organizations 
 
 ### Install
 
+windows - venv
+
 ```sh
-# Note: on windows use "python" not "python3"
-python3 -s -m venv venv
-source ./venv/bin/activate
-# or on windows: venv/scripts/activate
-python3 -s -m pip install -r requirements.txt
+cd ./projects/Stable-Diffusion-3-Sakura
+python -s -m venv sd3
+sd3\Scripts\activate
+python -s -m pip install -r requirements.txt
+```
+
+conda 
+
+```sh
+cd ./projects/Stable-Diffusion-3-Sakura
+conda create --name sd3 python=3.10.6
+conda activate sd3
+python -m pip install -r requirements.txt
 ```
 
 ### Test Usage
