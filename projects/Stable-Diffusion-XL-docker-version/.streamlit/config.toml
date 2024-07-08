@@ -1,0 +1,7 @@
+[client]
+displayEnabled = false
+toolbarMode = "viewer"
+
+[server]
+headless = true
+
