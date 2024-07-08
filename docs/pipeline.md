@@ -42,3 +42,41 @@
    - [xBD](https://xview2.org/dataset) (satellite: WorldView/QuickBird, resolution: ~0.5m)
    - `Vivid Standard Imagery Basemaps` samples from [Maxar](https://resources.maxar.com/product-samples/vivid-standard-imagery-basemaps-global-locations) (satellite: WorldView/QuickBird,  resolution: ~0.5m)
    - ... (ref to [heating dataset](../paper_writing/paper.md#dataset))
+
+## Experiments
+
+### Main 
+
+| Models                                  | FID  | CLIP-Score | SSIM | PSNR |
+| --------------------------------------- | ---- | ---------- | ---- | ---- |
+| Stable Diffusion                        |      |            |      |      |
+| Stable Diffusion XL                     |      |            |      |      |
+| Stable Diffusion 3                      |      |            |      |      |
+| ControlNet v1.1 (Stable Diffusion v2.1) |      |            |      |      |
+| DiffusionSAT                            |      |            |      |      |
+| **Our Model**                           |      |            |      |      |
+
+<div align="center">Table. Comparison of Post-event Image Generation with <a href="https://github.com/CompVis/stable-diffusion">Stable Diffusion</a> based models.</div>
+
+### Ablation
+
+#### Prompt Style
+
+- **Normal**: a fmow satellite image of a amusement park in Australia
+- **Weighted**: fmow, (satellite image:2) , amusement park, Australia
+- **Adversial**: a fmow sattellitte image of a amusement park in Australia
+- ...
+
+<div align="center">Figure. Comparison of Post-event Image Generation with different prompt style.</div>
+
+#### Hyper Parameters
+
+- Steps
+- Image Size
+- ...
+
+### Safety Check
+
+> Generated Images can be unsafe (releted to millitary et al.).
+
+DiffusionSAT is able to check image safety.

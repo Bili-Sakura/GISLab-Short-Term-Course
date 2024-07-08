@@ -76,3 +76,5 @@ To-do List:
 
 - [ ] Set up the environment of  [DiffusionSAT](https://github.com/samar-khanna/DiffusionSat), [Stable Diffusion](https://github.com/CompVis/stable-diffusion) and [ControlNet](https://github.com/lllyasviel/ControlNet) respectively
 - [ ] Read the paper and code of [DiffusionSAT](https://github.com/samar-khanna/DiffusionSat)
+- [ ] Further design the pipeline of our experinments (see [here](./docs/pipeline.md/#experiments))
+- [ ] Think about how to generate batch of prompts with language model assitant.
