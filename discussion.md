@@ -516,3 +516,45 @@ Progress: Stable Diffusion v1-v1.5 -> Stable Diffusion v2 -> Stable Diffusion XL
 > Esser, P., Kulal, S., Blattmann, A., Entezari, R., Müller, J., Saini, H., Levi, Y., Lorenz, D., Sauer, A., Boesel, F., Podell, D., Dockhorn, T., English, Z., & Rombach, R. (2024, June 6). Scaling Rectified Flow Transformers for High-Resolution Image Synthesis. Forty-first International Conference on Machine Learning. <https://openreview.net/forum?id=FPnUhsQJ5B>
 
 [Paper](./readings/Stable_Diffusion_3/Esser%20et%20al_2024_Scaling%20Rectified%20Flow%20Transformers%20for%20High-Resolution%20Image%20Synthesis.pdf)
+
+## 7/8 cst展示
+
+### Demo1
+
+```
+caption = "a fmow satellite image of a amusement park in Australia"
+metadata = [ 925.8798,  345.2111, 411.4541,    0.0000,  308.3333,  166.6667, 354.8387]
+```
+
+![图片alt](assets\SD-Australia.jpg)
+![图片alt](assets\output_Australia.png)
+
+### Demo2
+
+```
+caption = "a fmow satellite image of a electric substation in India"
+metadata = metadata_normalize([76.5712666476, 28.6965307997, 0.929417550564, 0.0765712666476, 2015, 2, 27]).tolist()
+```
+
+![图片alt](assets\SD-India.jpg)
+![图片alt](assets\output_india.jpg)
+
+### Demo3
+
+```
+caption = "A satellite image of a dam in the Three Gorges region, China"
+metadata = metadata_normalize([111.0280, 30.8210, 0.975, 0.075, 2023, 8, 15]).tolist()
+```
+
+![图片alt](assets\SD-dam.jpg)
+![图片alt](assets\output_dam.jpg)
+
+### Demo4
+
+```
+caption = "An urban satellite image highlighting green spaces in Central Park, New York City"
+metadata = metadata_normalize([-73.968285, 40.785091, 0.920, 0.080, 2022, 5, 10]).tolist()
+```
+
+![图片alt](assets\SD-NY.jpg)
+![图片alt](assets\output_NY.jpg)
