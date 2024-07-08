@@ -56,11 +56,11 @@ To-do List:
 
 Problems and Solutions:
 
-- [ ] ...
+- [x] ...
 
 To-do List:
 
-- [ ] Prepare Presentation for the next day (July 8th)
+- [x] Prepare Presentation for the next day (July 8th)
   - display samples generate by Stable Diffusion
   - display samples generate by DiffusionSAT
   - compare their difference with same prompt in naive way
@@ -75,3 +75,4 @@ Problems and Solutions:
 To-do List:
 
 - [ ] Set up the environment of  [DiffusionSAT](https://github.com/samar-khanna/DiffusionSat), [Stable Diffusion](https://github.com/CompVis/stable-diffusion) and [ControlNet](https://github.com/lllyasviel/ControlNet) respectively
+- [ ] Read the paper and code of [DiffusionSAT](https://github.com/samar-khanna/DiffusionSat)
