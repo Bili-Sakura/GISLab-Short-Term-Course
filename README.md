@@ -74,9 +74,9 @@ Problems and Solutions:
 
 To-do List:
 
+- [x] Further design the pipeline of our experiments (see [here](./docs/pipeline.md/#experiments))
 - [ ] Set up the environment of  [DiffusionSAT](https://github.com/samar-khanna/DiffusionSat), [Stable Diffusion](https://github.com/CompVis/stable-diffusion) and [ControlNet](https://github.com/lllyasviel/ControlNet) respectively
 - [ ] Read the paper and code of [DiffusionSAT](https://github.com/samar-khanna/DiffusionSat)
-- [x] Further design the pipeline of our experiments (see [here](./docs/pipeline.md/#experiments))
 - [ ] Think about how to generate batch of prompts with language model assistant.
 
 ### July<sup>9th</sup>
@@ -87,6 +87,22 @@ Problems and Solutions:
 
 To-do List:
 
+- [x] Read the paper and code of `DiffusionSAT`, see materials [here](./docs/introduction_to_diffusionsat.md) along with [PowerPoint](./lectures/Introduction_to_DiffusionSAT.pptx)
 - [ ] Set up the environment of  [DiffusionSAT](https://github.com/samar-khanna/DiffusionSat), [Stable Diffusion](https://github.com/CompVis/stable-diffusion) and [ControlNet](https://github.com/lllyasviel/ControlNet) respectively
-- [ ] Read the paper and code of `DiffusionSAT`, see materials [here](./docs/introduction_to_diffusionsat.md)
+  
 - [ ] Think about how to generate batch of prompts with language model assistant.
+
+Notes:
+
+1. xBD has 2 version of publication, be it [CVPR Workshop 2018](https://openaccess.thecvf.com/content_CVPRW_2019/html/cv4gc/Gupta_Creating_xBD_A_Dataset_for_Assessing_Building_Damage_from_Satellite_CVPRW_2019_paper.html) and [arXiv 2019](https://arxiv.org/abs/1911.09296), the arXiv version is correspondent to the released xBD dataset, where CVPR version is out-of-date
+2. The evolution of Stable Diffusion refers to note [here](./discussion.md#introduction-to-stable-diffusion-series-model). Stable Diffusion v1,v1.x,v2.1 (2021-2022) have same architecture which is used for ControlNet and  DiffusionSat. Stable Diffusion XL and XL Turbo are released in 2023 with new architecture. Stable Diffusion 3 is released in 2024.6 which is pretrained on 1B images and has a rectified workflow architecture that combined much more encoder modules than before.
+
+### July<sup>10th</sup>
+
+Problems and Solutions:
+
+- [ ] None
+
+To-do List:
+
+- [ ] ...
