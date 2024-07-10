@@ -1,7 +1,9 @@
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain.globals import set_verbose, get_verbose
+from langchain_glm import ChatZhipuAI
 import os
 from dotenv import load_dotenv
 import json
@@ -12,6 +14,7 @@ set_verbose(value=True)  # Enable verbose mode
 
 def generate_items():
     # Initialize the model
+    # model = ChatOpenAI(model="glm-4-turbo", api_key="")
     model = ChatOpenAI(model="gpt-3.5-turbo")
 
     # Create a prompt template

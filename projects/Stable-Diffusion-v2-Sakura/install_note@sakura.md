@@ -22,6 +22,8 @@ conda pack -n sd2 -o sd2.tar.gz
 
 mv sd2.tar.gz /mnt/d
 
+mkdir -p /home/gis2024/.conda/envs/sd2
+
 tar -xzf sd2.tar.gz -C /home/gis2024/.conda/envs/sd2
 ```
 

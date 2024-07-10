@@ -53,7 +53,7 @@
 | Models                      | FID  | CLIP-Score | SSIM | PSNR |
 | --------------------------- | ---- | ---------- | ---- | ---- |
 | Stable Diffusion ( sd v2.1) |      |            |      |      |
-| Stable Diffusion XL         |      |            |      |      |
+| Stable Diffusion XL Turbo   |      |            |      |      |
 | Stable Diffusion 3          |      |            |      |      |
 | ControlNet v1.1 (sd v2.1)   |      |            |      |      |
 | DiffusionSAT-base (sd v2.1) |      |            |      |      |
@@ -61,7 +61,7 @@
 
 <div align="center">Table. Comparison of Post-event Image Generation with <a href="https://github.com/CompVis/stable-diffusion">Stable Diffusion</a> based models.</div>
 
-> DiffusionSAT (base)  denotes 
+> DiffusionSAT (base)  denotes checkpoint of single generation model.
 
 ### Ablation
 
@@ -85,3 +85,25 @@
 > Generated Images can be unsafe (releted to millitary et al.).
 
 DiffusionSAT is able to check image safety.
+
+## Dataset Preparation
+
+> using language model (gpt-3.5.-turbo) to generate batch prompt (.json)
+
+### Desired Format
+
+```json
+[
+    {
+       "key":"value",
+        ...
+    },
+    {
+}
+]
+```
+
+### Hierarchy/Loop/Combination Generation Pipeline
+
+2000 prompts = 50 cities&metadata × 4 disasters  × 10 captions
+

@@ -83,7 +83,7 @@ To-do List:
 
 Problems and Solutions:
 
-- [ ] None
+- [x] None
 
 To-do List:
 
@@ -105,4 +105,4 @@ Problems and Solutions:
 
 To-do List:
 
-- [ ] ...
+- [ ] Generate batch of prompts with language model assistant - [RSGPT](./projects/RSGPT/README.md).
