@@ -56,13 +56,20 @@ This project uses LangChain with the OpenAI API to generate a batch of items in 
 1. **Navigate to the Project Directory:**
 
     ```bash
-    cd gpt
+    cd RSGPT
     ```
 
 2. **Run the Main Script:**
 
     ```bash
-    python src/main.py
+    run.bat
+    python main.py
     ```
 
 This will generate a batch of items using LangChain with the OpenAI API and save them in `data/items.json`.
+
+Create `.env` File
+
+```
+OPENAI_API_KEY="sk-xxx"
+```
