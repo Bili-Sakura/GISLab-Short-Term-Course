@@ -9,16 +9,25 @@ from dotenv import load_dotenv
 import json
 
 load_dotenv()
+# Get the API keys from environment variables
+openai_api_key = os.getenv("OPENAI_API_KEY")
+zhipuai_api_key = os.getenv("ZHIPUAI_API_KEY")
+deepseek_api_key = os.getenv("DEEPSEEK_API_KEY")
 set_verbose(value=True)  # Enable verbose mode
 
 
 def generate_items():
     # Initialize the model
     # model = ChatOpenAI(model="glm-4-turbo", api_key="")
-    model = ChatOpenAI(model="gpt-3.5-turbo")
-
+    # model = ChatOpenAI(model="gpt-3.5-turbo")
+    model = ChatOpenAI(
+        model="deepseek-chat",
+        api_key=deepseek_api_key,
+        openai_api_base="https://api.deepseek.com",
+        max_tokens=1024,
+    )
     # Create a prompt template
-    system_template = "Generate a list of items:"
+    system_template = "Generate 10 cities in list:"
     prompt_template = ChatPromptTemplate.from_messages(
         [("system", system_template), ("user", "")]
     )
