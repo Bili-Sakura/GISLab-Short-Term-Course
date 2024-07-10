@@ -3,20 +3,23 @@
 ## Overview
 
 - Develop a Conditional Diffusion Model specialized for post-event remote sensing image generation
-- Compare our model with mainstream model to show the strength (e.g. [FID](https://proceedings.neurips.cc/paper/2017/hash/8a1d694707eb0fefe65871369074926d-Abstract.html), downstream task augmentation, less hallucination) of our model 
+- Compare our model with mainstream model to show the strength (e.g. [FID](https://proceedings.neurips.cc/paper/2017/hash/8a1d694707eb0fefe65871369074926d-Abstract.html), downstream task augmentation, less hallucination) of our model
 - Produce a synthetic dataset based our model  
 
-> Future Work:
->
-> 1. ControlNet++: Improving Conditional Controls with Efficient Consistency Feedback
->    - [Code](https://github.com/liming-ai/ControlNet_Plus_Plus)
->    - [Paper (Accepted by ECCV 2024)](https://liming-ai.github.io/ControlNet_Plus_Plus/)
-> 2. Uni-ControlNet: All-in-One Control to Text-to-Image Diffusion Models
->    - [Code](https://github.com/ShihaoZhaoZSH/Uni-ControlNet)
->    - [Paper (Accepted by NeurIPS 2023)](https://proceedings.neurips.cc/paper_files/paper/2023/hash/2468f84a13ff8bb6767a67518fb596eb-Abstract-Conference.html)
-> 3. OpenEarthMap: A Benchmark Dataset for Global High-Resolution Land Cover Mapping
->    - [Dataset](https://open-earth-map.org/)
->    - [Paper (Accepted by WACV 2023)](https://openaccess.thecvf.com/content/WACV2023/html/Xia_OpenEarthMap_A_Benchmark_Dataset_for_Global_High-Resolution_Land_Cover_Mapping_WACV_2023_paper.html)
+<details>
+<summary>Future Work</summary>
+1. ControlNet++: Improving Conditional Controls with Efficient Consistency Feedback
+   <a href="https://github.com/liming-ai/ControlNet_Plus_Plus">Code</a>,
+   <a href="https://liming-ai.github.io/ControlNet_Plus_Plus/">Paper</a> (Accepted by ECCV 2024)<div></div>
+2. Uni-ControlNet: All-in-One Control to Text-to-Image Diffusion Models
+   <a href="https://github.com/ShihaoZhaoZSH/Uni-ControlNet">Code</a>,
+   <a href="https://proceedings.neurips.cc/paper_files/paper/2023/hash/2468f84a13ff8bb6767a67518fb596eb-Abstract-Conference.html">Paper</a> (Accepted by NeurIPS 2023)
+   <div></div>
+3. OpenEarthMap: A Benchmark Dataset for Global High-Resolution Land Cover Mapping
+   <a href="https://open-earth-map.org/">Dataset</a>,
+   <a href="https://openaccess.thecvf.com/content/WACV2023/html/Xia_OpenEarthMap_A_Benchmark_Dataset_for_Global_High-Resolution_Land_Cover_Mapping_WACV_2023_paper.html">Paper</a> (Accepted by WACV 2023)
+   <div></div>
+</details>
 
 ## Experiment Pipeline
 
@@ -45,18 +48,20 @@
 
 ## Experiments
 
-### Main 
+### Main
 
-| Models                                  | FID  | CLIP-Score | SSIM | PSNR |
-| --------------------------------------- | ---- | ---------- | ---- | ---- |
-| Stable Diffusion                        |      |            |      |      |
-| Stable Diffusion XL                     |      |            |      |      |
-| Stable Diffusion 3                      |      |            |      |      |
-| ControlNet v1.1 (Stable Diffusion v2.1) |      |            |      |      |
-| DiffusionSAT                            |      |            |      |      |
-| **Our Model**                           |      |            |      |      |
+| Models                      | FID  | CLIP-Score | SSIM | PSNR |
+| --------------------------- | ---- | ---------- | ---- | ---- |
+| Stable Diffusion ( sd v2.1) |      |            |      |      |
+| Stable Diffusion XL Turbo   |      |            |      |      |
+| Stable Diffusion 3          |      |            |      |      |
+| ControlNet v1.1 (sd v2.1)   |      |            |      |      |
+| DiffusionSAT-base (sd v2.1) |      |            |      |      |
+| **Our Model**               |      |            |      |      |
 
 <div align="center">Table. Comparison of Post-event Image Generation with <a href="https://github.com/CompVis/stable-diffusion">Stable Diffusion</a> based models.</div>
+
+> DiffusionSAT (base)  denotes checkpoint of single generation model.
 
 ### Ablation
 
@@ -80,3 +85,25 @@
 > Generated Images can be unsafe (releted to millitary et al.).
 
 DiffusionSAT is able to check image safety.
+
+## Dataset Preparation
+
+> using language model (gpt-3.5.-turbo) to generate batch prompt (.json)
+
+### Desired Format
+
+```json
+[
+    {
+       "key":"value",
+        ...
+    },
+    {
+}
+]
+```
+
+### Hierarchy/Loop/Combination Generation Pipeline
+
+2000 prompts = 50 cities&metadata × 4 disasters  × 10 captions
+
