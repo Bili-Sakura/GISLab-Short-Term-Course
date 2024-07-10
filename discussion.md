@@ -526,8 +526,15 @@ caption = "a fmow satellite image of a amusement park in Australia"
 metadata = [ 925.8798,  345.2111, 411.4541,    0.0000,  308.3333,  166.6667, 354.8387]
 ```
 
+<<<<<<< HEAD
 ![图片alt](assets/SD-Australia.jpg)
 ![图片alt](assets/output_Australia.png)
+=======
+<div style="display: flex;">
+    <img src="assets/SD-Australia.jpg" alt="Image1" style="width: 512px; height: 512px;">
+    <img src="assets/output_Australia.png" alt="Output1" style="width: 512px; height: 512px;">
+</div>
+>>>>>>> be985e4c6357c9c04fd1d3c4fe6a7fee1a91e77b
 
 ### Demo2
 
@@ -536,8 +543,15 @@ caption = "a fmow satellite image of a electric substation in India"
 metadata = metadata_normalize([76.5712666476, 28.6965307997, 0.929417550564, 0.0765712666476, 2015, 2, 27]).tolist()
 ```
 
+<<<<<<< HEAD
 ![图片alt](assets/SD-India.jpg)
 ![图片alt](assets/output_india.jpg)
+=======
+<div style="display: flex;">
+    <img src="assets/SD-India.jpg" alt="Image2" style="width: 512px; height: 512px;">
+    <img src="assets/output_india.jpg" alt="Output2" style="width: 512px; height: 512px;">
+</div>
+>>>>>>> be985e4c6357c9c04fd1d3c4fe6a7fee1a91e77b
 
 ### Demo3
 
@@ -546,8 +560,15 @@ caption = "A satellite image of a dam in the Three Gorges region, China"
 metadata = metadata_normalize([111.0280, 30.8210, 0.975, 0.075, 2023, 8, 15]).tolist()
 ```
 
+<<<<<<< HEAD
 ![图片alt](assets/SD-dam.jpg)
 ![图片alt](assets/output_dam.jpg)
+=======
+<div style="display: flex;">
+    <img src="assets/SD-dam.jpg" alt="Image3" style="width: 512px; height: 512px;">
+    <img src="assets/output_dam.jpg" alt="Output3" style="width: 512px; height: 512px;">
+</div>
+>>>>>>> be985e4c6357c9c04fd1d3c4fe6a7fee1a91e77b
 
 ### Demo4
 
@@ -556,5 +577,12 @@ caption = "An urban satellite image highlighting green spaces in Central Park, N
 metadata = metadata_normalize([-73.968285, 40.785091, 0.920, 0.080, 2022, 5, 10]).tolist()
 ```
 
+<<<<<<< HEAD
 ![图片alt](assets/SD-NY.jpg)
 ![图片alt](assets/output_NY.jpg)
+=======
+<div style="display: flex;">
+    <img src="assets/SD-NY.jpg" alt="Image4" style="width: 512px; height: 512px;">
+    <img src="assets/output_NY.jpg" alt="Output4" style="width: 512px; height: 512px;">
+</div>
+>>>>>>> be985e4c6357c9c04fd1d3c4fe6a7fee1a91e77b
