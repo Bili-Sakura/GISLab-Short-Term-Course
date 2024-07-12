@@ -130,7 +130,7 @@ DiffusionSAT is able to check image safety.
       │   │   ├── image2_post.png
       │   │   └── ...
       │   ├── captions.json           # Text prompts as well as metadata for each image
-      	├── mask/                   # Mask images (e.g. region that affected by disaster)
+      	├── mask/                   # （opt）Mask images (e.g. region that affected by disaster)
       │   │   ├── image1_mask.png
       │   │   ├── image2_mask.png
       │   │   └── ...

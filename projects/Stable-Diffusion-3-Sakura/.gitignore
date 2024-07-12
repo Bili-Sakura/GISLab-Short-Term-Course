@@ -1,4 +1,5 @@
 venv/
+checkpoint
 #models/
 *.safetensors
 __pycache__/
