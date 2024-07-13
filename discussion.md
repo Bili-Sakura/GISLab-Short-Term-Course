@@ -689,11 +689,13 @@ Output：output_India_8 to 11
     Output: output_India_13
 (3) Prompt: A satellite image of Indian farmland suffering from floods, with many buildings scattering in different areas of the image
     Output: output_India_14
+(4) Prompt: A satellite image of Indian farmland suffering from floods, with only two buildings in the image
+    Output: output_India_19
 ```
 
 > sequence: DiffusionSat/SDv3-reference img
 
-<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center;">
+<div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; text-align: center;">
   <!-- 第一列 -->
   <div>
     <img src="assets/discussion-img/output_India_12.jpg" alt="Image 1" style="width: 100%; height: auto;">
@@ -711,6 +713,12 @@ Output：output_India_8 to 11
     <img src="assets/discussion-img/output_India_14.jpg" alt="Image 5" style="width: 100%; height: auto;">
     <img src="assets/discussion-img/output_India_14_SD_reference.png" alt="Image 6" style="width: 100%; height: auto;">
     <p>scatter</p>
+  </div>
+  <!-- 第四列 -->
+  <div>
+    <img src="assets/discussion-img/output_India_19.jpg" alt="Image 7" style="width: 100%; height: auto;">
+    <img src="assets/discussion-img/output_India_19_SD_reference.png" alt="Image 8" style="width: 100%; height: auto;">
+    <p>two buildings</p>
   </div>
 </div>
 
