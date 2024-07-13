@@ -763,3 +763,7 @@ Output：output_India_8 to 11
     <p>small scale</p>
   </div>
 </div>
+## 7.4Training@sakura
+
+Example: Training ControlNet with Diffusers: [Web Link](https://github.com/huggingface/diffusers/tree/main/examples/controlnet) / [Local Doc](./docs/train_with_diffusers/md)
+
