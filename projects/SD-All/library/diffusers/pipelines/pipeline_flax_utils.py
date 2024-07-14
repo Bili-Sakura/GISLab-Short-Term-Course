@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2024 The HuggingFace Inc. team.
+# Copyright 2023 The HuggingFace Inc. team.
 # Copyright (c) 2022, NVIDIA CORPORATION.  All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,24 +21,16 @@ from typing import Any, Dict, List, Optional, Union
 
 import flax
 import numpy as np
-import PIL.Image
+import PIL
 from flax.core.frozen_dict import FrozenDict
-from huggingface_hub import create_repo, snapshot_download
-from huggingface_hub.utils import validate_hf_hub_args
+from huggingface_hub import snapshot_download
 from PIL import Image
 from tqdm.auto import tqdm
 
 from ..configuration_utils import ConfigMixin
 from ..models.modeling_flax_utils import FLAX_WEIGHTS_NAME, FlaxModelMixin
 from ..schedulers.scheduling_utils_flax import SCHEDULER_CONFIG_NAME, FlaxSchedulerMixin
-from ..utils import (
-    CONFIG_NAME,
-    BaseOutput,
-    PushToHubMixin,
-    http_user_agent,
-    is_transformers_available,
-    logging,
-)
+from ..utils import CONFIG_NAME, DIFFUSERS_CACHE, BaseOutput, http_user_agent, is_transformers_available, logging
 
 
 if is_transformers_available():
@@ -91,28 +83,28 @@ class FlaxImagePipelineOutput(BaseOutput):
 
     Args:
         images (`List[PIL.Image.Image]` or `np.ndarray`)
-            List of denoised PIL images of length `batch_size` or NumPy array of shape `(batch_size, height, width,
-            num_channels)`.
+            List of denoised PIL images of length `batch_size` or numpy array of shape `(batch_size, height, width,
+            num_channels)`. PIL images or numpy array present the denoised images of the diffusion pipeline.
     """
 
     images: Union[List[PIL.Image.Image], np.ndarray]
 
 
-class FlaxDiffusionPipeline(ConfigMixin, PushToHubMixin):
+class FlaxDiffusionPipeline(ConfigMixin):
     r"""
-    Base class for Flax-based pipelines.
+    Base class for all models.
 
-    [`FlaxDiffusionPipeline`] stores all components (models, schedulers, and processors) for diffusion pipelines and
-    provides methods for loading, downloading and saving models. It also includes methods to:
+    [`FlaxDiffusionPipeline`] takes care of storing all components (models, schedulers, processors) for diffusion
+    pipelines and handles methods for loading, downloading and saving models as well as a few methods common to all
+    pipelines to:
 
-        - enable/disable the progress bar for the denoising iteration
+        - enabling/disabling the progress bar for the denoising iteration
 
     Class attributes:
 
-        - **config_name** ([`str`]) -- The configuration filename that stores the class and module names of all the
-          diffusion pipeline's components.
+        - **config_name** ([`str`]) -- name of the config file that will store the class and module names of all
+          components of the diffusion pipeline.
     """
-
     config_name = "model_index.json"
 
     def register_modules(self, **kwargs):
@@ -148,28 +140,17 @@ class FlaxDiffusionPipeline(ConfigMixin, PushToHubMixin):
             # set models
             setattr(self, name, module)
 
-    def save_pretrained(
-        self,
-        save_directory: Union[str, os.PathLike],
-        params: Union[Dict, FrozenDict],
-        push_to_hub: bool = False,
-        **kwargs,
-    ):
+    def save_pretrained(self, save_directory: Union[str, os.PathLike], params: Union[Dict, FrozenDict]):
         # TODO: handle inference_state
         """
-        Save all saveable variables of the pipeline to a directory. A pipeline variable can be saved and loaded if its
-        class implements both a save and loading method. The pipeline is easily reloaded using the
-        [`~FlaxDiffusionPipeline.from_pretrained`] class method.
+        Save all variables of the pipeline that can be saved and loaded as well as the pipelines configuration file to
+        a directory. A pipeline variable can be saved and loaded if its class implements both a save and loading
+        method. The pipeline can easily be re-loaded using the `[`~FlaxDiffusionPipeline.from_pretrained`]` class
+        method.
 
         Arguments:
             save_directory (`str` or `os.PathLike`):
                 Directory to which to save. Will be created if it doesn't exist.
-            push_to_hub (`bool`, *optional*, defaults to `False`):
-                Whether or not to push your model to the Hugging Face model hub after saving it. You can specify the
-                repository you want to push to with `repo_id` (will default to the name of `save_directory` in your
-                namespace).
-            kwargs (`Dict[str, Any]`, *optional*):
-                Additional keyword arguments passed along to the [`~utils.PushToHubMixin.push_to_hub`] method.
         """
         self.save_config(save_directory)
 
@@ -177,14 +158,6 @@ class FlaxDiffusionPipeline(ConfigMixin, PushToHubMixin):
         model_index_dict.pop("_class_name")
         model_index_dict.pop("_diffusers_version")
         model_index_dict.pop("_module", None)
-
-        if push_to_hub:
-            commit_message = kwargs.pop("commit_message", None)
-            private = kwargs.pop("private", False)
-            create_pr = kwargs.pop("create_pr", False)
-            token = kwargs.pop("token", None)
-            repo_id = kwargs.pop("repo_id", save_directory.split(os.path.sep)[-1])
-            repo_id = create_repo(repo_id, exist_ok=True, private=private, token=token).repo_id
 
         for pipeline_component_name in model_index_dict.keys():
             sub_model = getattr(self, pipeline_component_name)
@@ -217,72 +190,73 @@ class FlaxDiffusionPipeline(ConfigMixin, PushToHubMixin):
             else:
                 save_method(os.path.join(save_directory, pipeline_component_name))
 
-            if push_to_hub:
-                self._upload_folder(
-                    save_directory,
-                    repo_id,
-                    token=token,
-                    commit_message=commit_message,
-                    create_pr=create_pr,
-                )
-
     @classmethod
-    @validate_hf_hub_args
     def from_pretrained(cls, pretrained_model_name_or_path: Optional[Union[str, os.PathLike]], **kwargs):
         r"""
-        Instantiate a Flax-based diffusion pipeline from pretrained pipeline weights.
+        Instantiate a Flax diffusion pipeline from pre-trained pipeline weights.
 
-        The pipeline is set in evaluation mode (`model.eval()) by default and dropout modules are deactivated.
+        The pipeline is set in evaluation mode by default using `model.eval()` (Dropout modules are deactivated).
 
-        If you get the error message below, you need to finetune the weights for your downstream task:
+        The warning *Weights from XXX not initialized from pretrained model* means that the weights of XXX do not come
+        pretrained with the rest of the model. It is up to you to train those weights with a downstream fine-tuning
+        task.
 
-        ```
-        Some weights of FlaxUNet2DConditionModel were not initialized from the model checkpoint at runwayml/stable-diffusion-v1-5 and are newly initialized because the shapes did not match:
-        ```
+        The warning *Weights from XXX not used in YYY* means that the layer XXX is not used by YYY, therefore those
+        weights are discarded.
 
         Parameters:
             pretrained_model_name_or_path (`str` or `os.PathLike`, *optional*):
                 Can be either:
 
-                    - A string, the *repo id* (for example `runwayml/stable-diffusion-v1-5`) of a pretrained pipeline
-                      hosted on the Hub.
-                    - A path to a *directory* (for example `./my_model_directory`) containing the model weights saved
-                      using [`~FlaxDiffusionPipeline.save_pretrained`].
+                    - A string, the *repo id* of a pretrained pipeline hosted inside a model repo on
+                      https://huggingface.co/ Valid repo ids have to be located under a user or organization name, like
+                      `CompVis/ldm-text2im-large-256`.
+                    - A path to a *directory* containing pipeline weights saved using
+                      [`~FlaxDiffusionPipeline.save_pretrained`], e.g., `./my_pipeline_directory/`.
             dtype (`str` or `jnp.dtype`, *optional*):
-                Override the default `jnp.dtype` and load the model under this dtype. If `"auto"`, the dtype is
-                automatically derived from the model's weights.
+                Override the default `jnp.dtype` and load the model under this dtype. If `"auto"` is passed the dtype
+                will be automatically derived from the model's weights.
             force_download (`bool`, *optional*, defaults to `False`):
                 Whether or not to force the (re-)download of the model weights and configuration files, overriding the
                 cached versions if they exist.
-            resume_download:
-                Deprecated and ignored. All downloads are now resumed by default when possible. Will be removed in v1
-                of Diffusers.
+            resume_download (`bool`, *optional*, defaults to `False`):
+                Whether or not to delete incompletely received files. Will attempt to resume the download if such a
+                file exists.
             proxies (`Dict[str, str]`, *optional*):
-                A dictionary of proxy servers to use by protocol or endpoint, for example, `{'http': 'foo.bar:3128',
+                A dictionary of proxy servers to use by protocol or endpoint, e.g., `{'http': 'foo.bar:3128',
                 'http://hostname': 'foo.bar:4012'}`. The proxies are used on each request.
             output_loading_info(`bool`, *optional*, defaults to `False`):
                 Whether or not to also return a dictionary containing missing keys, unexpected keys and error messages.
-            local_files_only (`bool`, *optional*, defaults to `False`):
-                Whether to only load local model weights and configuration files or not. If set to `True`, the model
-                won't be downloaded from the Hub.
-            token (`str` or *bool*, *optional*):
-                The token to use as HTTP bearer authorization for remote files. If `True`, the token generated from
-                `diffusers-cli login` (stored in `~/.huggingface`) is used.
+            local_files_only(`bool`, *optional*, defaults to `False`):
+                Whether or not to only look at local files (i.e., do not try to download the model).
+            use_auth_token (`str` or *bool*, *optional*):
+                The token to use as HTTP bearer authorization for remote files. If `True`, will use the token generated
+                when running `huggingface-cli login` (stored in `~/.huggingface`).
             revision (`str`, *optional*, defaults to `"main"`):
-                The specific model version to use. It can be a branch name, a tag name, a commit id, or any identifier
-                allowed by Git.
+                The specific model version to use. It can be a branch name, a tag name, or a commit id, since we use a
+                git-based system for storing models and other artifacts on huggingface.co, so `revision` can be any
+                identifier allowed by git.
             mirror (`str`, *optional*):
-                Mirror source to resolve accessibility issues if you're downloading a model in China. We do not
-                guarantee the timeliness or safety of the source, and you should refer to the mirror site for more
-                information.
+                Mirror source to accelerate downloads in China. If you are from China and have an accessibility
+                problem, you can set this option to resolve it. Note that we do not guarantee the timeliness or safety.
+                Please refer to the mirror site for more information. specify the folder name here.
+
             kwargs (remaining dictionary of keyword arguments, *optional*):
-                Can be used to overwrite load and saveable variables (the pipeline components) of the specific pipeline
-                class. The overwritten components are passed directly to the pipelines `__init__` method.
+                Can be used to overwrite load - and saveable variables - *i.e.* the pipeline components - of the
+                specific pipeline class. The overwritten components are then directly passed to the pipelines
+                `__init__` method. See example below for more information.
 
         <Tip>
 
-        To use private or [gated models](https://huggingface.co/docs/hub/models-gated#gated-models), log-in with
-        `huggingface-cli login`.
+         It is required to be logged in (`huggingface-cli login`) when you want to use private or [gated
+         models](https://huggingface.co/docs/hub/models-gated#gated-models), *e.g.* `"runwayml/stable-diffusion-v1-5"`
+
+        </Tip>
+
+        <Tip>
+
+        Activate the special ["offline-mode"](https://huggingface.co/diffusers/installation.html#offline-mode) to use
+        this method in a firewalled environment.
 
         </Tip>
 
@@ -296,7 +270,7 @@ class FlaxDiffusionPipeline(ConfigMixin, PushToHubMixin):
         >>> # see more in [the documentation](https://huggingface.co/docs/hub/security-tokens)
         >>> pipeline, params = FlaxDiffusionPipeline.from_pretrained(
         ...     "runwayml/stable-diffusion-v1-5",
-        ...     variant="bf16",
+        ...     revision="bf16",
         ...     dtype=jnp.bfloat16,
         ... )
 
@@ -310,20 +284,19 @@ class FlaxDiffusionPipeline(ConfigMixin, PushToHubMixin):
         ... )
 
         >>> dpm_pipe, dpm_params = FlaxStableDiffusionPipeline.from_pretrained(
-        ...     model_id, variant="bf16", dtype=jnp.bfloat16, scheduler=dpmpp
+        ...     model_id, revision="bf16", dtype=jnp.bfloat16, scheduler=dpmpp
         ... )
         >>> dpm_params["scheduler"] = dpmpp_state
         ```
         """
-        cache_dir = kwargs.pop("cache_dir", None)
-        resume_download = kwargs.pop("resume_download", None)
+        cache_dir = kwargs.pop("cache_dir", DIFFUSERS_CACHE)
+        resume_download = kwargs.pop("resume_download", False)
         proxies = kwargs.pop("proxies", None)
         local_files_only = kwargs.pop("local_files_only", False)
-        token = kwargs.pop("token", None)
+        use_auth_token = kwargs.pop("use_auth_token", None)
         revision = kwargs.pop("revision", None)
         from_pt = kwargs.pop("from_pt", False)
         use_memory_efficient_attention = kwargs.pop("use_memory_efficient_attention", False)
-        split_head_dim = kwargs.pop("split_head_dim", False)
         dtype = kwargs.pop("dtype", None)
 
         # 1. Download the checkpoints and configs
@@ -335,7 +308,7 @@ class FlaxDiffusionPipeline(ConfigMixin, PushToHubMixin):
                 resume_download=resume_download,
                 proxies=proxies,
                 local_files_only=local_files_only,
-                token=token,
+                use_auth_token=use_auth_token,
                 revision=revision,
             )
             # make sure we only download sub-folders and `diffusers` filenames
@@ -343,8 +316,8 @@ class FlaxDiffusionPipeline(ConfigMixin, PushToHubMixin):
             allow_patterns = [os.path.join(k, "*") for k in folder_names]
             allow_patterns += [FLAX_WEIGHTS_NAME, SCHEDULER_CONFIG_NAME, CONFIG_NAME, cls.config_name]
 
-            ignore_patterns = ["*.bin", "*.safetensors"] if not from_pt else []
-            ignore_patterns += ["*.onnx", "*.onnx_data", "*.xml", "*.pb"]
+            # make sure we don't download PyTorch weights, unless when using from_pt
+            ignore_patterns = "*.bin" if not from_pt else []
 
             if cls != FlaxDiffusionPipeline:
                 requested_pipeline_class = cls.__name__
@@ -366,7 +339,7 @@ class FlaxDiffusionPipeline(ConfigMixin, PushToHubMixin):
                 resume_download=resume_download,
                 proxies=proxies,
                 local_files_only=local_files_only,
-                token=token,
+                use_auth_token=use_auth_token,
                 revision=revision,
                 allow_patterns=allow_patterns,
                 ignore_patterns=ignore_patterns,
@@ -395,29 +368,10 @@ class FlaxDiffusionPipeline(ConfigMixin, PushToHubMixin):
         # extract them here
         expected_modules, optional_kwargs = cls._get_signature_keys(pipeline_class)
         passed_class_obj = {k: kwargs.pop(k) for k in expected_modules if k in kwargs}
-        passed_pipe_kwargs = {k: kwargs.pop(k) for k in optional_kwargs if k in kwargs}
 
-        init_dict, unused_kwargs, _ = pipeline_class.extract_init_dict(config_dict, **kwargs)
+        init_dict, _, _ = pipeline_class.extract_init_dict(config_dict, **kwargs)
 
-        # define init kwargs
-        init_kwargs = {k: init_dict.pop(k) for k in optional_kwargs if k in init_dict}
-        init_kwargs = {**init_kwargs, **passed_pipe_kwargs}
-
-        # remove `null` components
-        def load_module(name, value):
-            if value[0] is None:
-                return False
-            if name in passed_class_obj and passed_class_obj[name] is None:
-                return False
-            return True
-
-        init_dict = {k: v for k, v in init_dict.items() if load_module(k, v)}
-
-        # Throw nice warnings / errors for fast accelerate loading
-        if len(unused_kwargs) > 0:
-            logger.warning(
-                f"Keyword arguments {unused_kwargs} are not expected by {pipeline_class.__name__} and will be ignored."
-            )
+        init_kwargs = {}
 
         # inference_params
         params = {}
@@ -502,7 +456,6 @@ class FlaxDiffusionPipeline(ConfigMixin, PushToHubMixin):
                         loadable_folder,
                         from_pt=from_pt,
                         use_memory_efficient_attention=use_memory_efficient_attention,
-                        split_head_dim=split_head_dim,
                         dtype=dtype,
                     )
                     params[name] = loaded_params
@@ -539,13 +492,12 @@ class FlaxDiffusionPipeline(ConfigMixin, PushToHubMixin):
         model = pipeline_class(**init_kwargs, dtype=dtype)
         return model, params
 
-    @classmethod
-    def _get_signature_keys(cls, obj):
+    @staticmethod
+    def _get_signature_keys(obj):
         parameters = inspect.signature(obj.__init__).parameters
         required_parameters = {k: v for k, v in parameters.items() if v.default == inspect._empty}
         optional_parameters = set({k for k, v in parameters.items() if v.default != inspect._empty})
         expected_modules = set(required_parameters.keys()) - {"self"}
-
         return expected_modules, optional_parameters
 
     @property
@@ -564,7 +516,7 @@ class FlaxDiffusionPipeline(ConfigMixin, PushToHubMixin):
         ... )
 
         >>> text2img = FlaxStableDiffusionPipeline.from_pretrained(
-        ...     "runwayml/stable-diffusion-v1-5", variant="bf16", dtype=jnp.bfloat16
+        ...     "runwayml/stable-diffusion-v1-5", revision="bf16", dtype=jnp.bfloat16
         ... )
         >>> img2img = FlaxStableDiffusionImg2ImgPipeline(**text2img.components)
         ```
@@ -588,7 +540,7 @@ class FlaxDiffusionPipeline(ConfigMixin, PushToHubMixin):
     @staticmethod
     def numpy_to_pil(images):
         """
-        Convert a NumPy image or a batch of images to a PIL image.
+        Convert a numpy image or a batch of images to a PIL image.
         """
         if images.ndim == 3:
             images = images[None, ...]

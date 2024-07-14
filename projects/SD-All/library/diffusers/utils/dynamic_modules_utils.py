@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2024 The HuggingFace Inc. team.
+# Copyright 2023 The HuggingFace Inc. team.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,28 +21,29 @@ import os
 import re
 import shutil
 import sys
+from distutils.version import StrictVersion
 from pathlib import Path
 from typing import Dict, Optional, Union
 from urllib import request
 
-from huggingface_hub import hf_hub_download, model_info
-from huggingface_hub.utils import RevisionNotFoundError, validate_hf_hub_args
-from packaging import version
+from huggingface_hub import HfFolder, cached_download, hf_hub_download, model_info
 
 from .. import __version__
 from . import DIFFUSERS_DYNAMIC_MODULE_NAME, HF_MODULES_CACHE, logging
 
 
-logger = logging.get_logger(__name__)  # pylint: disable=invalid-name
+COMMUNITY_PIPELINES_URL = (
+    "https://raw.githubusercontent.com/huggingface/diffusers/{revision}/examples/community/{pipeline}.py"
+)
 
-# See https://huggingface.co/datasets/diffusers/community-pipelines-mirror
-COMMUNITY_PIPELINES_MIRROR_ID = "diffusers/community-pipelines-mirror"
+
+logger = logging.get_logger(__name__)  # pylint: disable=invalid-name
 
 
 def get_diffusers_versions():
     url = "https://pypi.org/pypi/diffusers/json"
     releases = json.loads(request.urlopen(url).read())["releases"].keys()
-    return sorted(releases, key=lambda x: version.Version(x))
+    return sorted(releases, key=StrictVersion)
 
 
 def init_hf_modules():
@@ -86,9 +87,9 @@ def get_relative_imports(module_file):
         content = f.read()
 
     # Imports of the form `import .xxx`
-    relative_imports = re.findall(r"^\s*import\s+\.(\S+)\s*$", content, flags=re.MULTILINE)
+    relative_imports = re.findall("^\s*import\s+\.(\S+)\s*$", content, flags=re.MULTILINE)
     # Imports of the form `from .xxx import yyy`
-    relative_imports += re.findall(r"^\s*from\s+\.(\S+)\s+import", content, flags=re.MULTILINE)
+    relative_imports += re.findall("^\s*from\s+\.(\S+)\s+import", content, flags=re.MULTILINE)
     # Unique-ify
     return list(set(relative_imports))
 
@@ -130,9 +131,9 @@ def check_imports(filename):
         content = f.read()
 
     # Imports of the form `import xxx`
-    imports = re.findall(r"^\s*import\s+(\S+)\s*$", content, flags=re.MULTILINE)
+    imports = re.findall("^\s*import\s+(\S+)\s*$", content, flags=re.MULTILINE)
     # Imports of the form `from xxx import yyy`
-    imports += re.findall(r"^\s*from\s+(\S+)\s+import", content, flags=re.MULTILINE)
+    imports += re.findall("^\s*from\s+(\S+)\s+import", content, flags=re.MULTILINE)
     # Only keep the top-level module
     imports = [imp.split(".")[0] for imp in imports if not imp.startswith(".")]
 
@@ -193,15 +194,14 @@ def find_pipeline_class(loaded_module):
     return pipeline_class
 
 
-@validate_hf_hub_args
 def get_cached_module_file(
     pretrained_model_name_or_path: Union[str, os.PathLike],
     module_file: str,
     cache_dir: Optional[Union[str, os.PathLike]] = None,
     force_download: bool = False,
-    resume_download: Optional[bool] = None,
+    resume_download: bool = False,
     proxies: Optional[Dict[str, str]] = None,
-    token: Optional[Union[bool, str]] = None,
+    use_auth_token: Optional[Union[bool, str]] = None,
     revision: Optional[str] = None,
     local_files_only: bool = False,
 ):
@@ -226,13 +226,13 @@ def get_cached_module_file(
             cache should not be used.
         force_download (`bool`, *optional*, defaults to `False`):
             Whether or not to force to (re-)download the configuration files and override the cached versions if they
-            exist. resume_download:
-                Deprecated and ignored. All downloads are now resumed by default when possible. Will be removed in v1
-                of Diffusers.
+            exist.
+        resume_download (`bool`, *optional*, defaults to `False`):
+            Whether or not to delete incompletely received file. Attempts to resume the download if such a file exists.
         proxies (`Dict[str, str]`, *optional*):
             A dictionary of proxy servers to use by protocol or endpoint, e.g., `{'http': 'foo.bar:3128',
             'http://hostname': 'foo.bar:4012'}.` The proxies are used on each request.
-        token (`str` or *bool*, *optional*):
+        use_auth_token (`str` or *bool*, *optional*):
             The token to use as HTTP bearer authorization for remote files. If `True`, will use the token generated
             when running `transformers-cli login` (stored in `~/.huggingface`).
         revision (`str`, *optional*, defaults to `"main"`):
@@ -244,8 +244,8 @@ def get_cached_module_file(
 
     <Tip>
 
-    You may pass a token in `token` if you are not logged in (`huggingface-cli login`) and want to use private or
-    [gated models](https://huggingface.co/docs/hub/models-gated#gated-models).
+    You may pass a token in `use_auth_token` if you are not logged in (`huggingface-cli long`) and want to use private
+    or [gated models](https://huggingface.co/docs/hub/models-gated#gated-models).
 
     </Tip>
 
@@ -279,24 +279,20 @@ def get_cached_module_file(
                 f" {', '.join(available_versions + ['main'])}."
             )
 
+        # community pipeline on GitHub
+        github_url = COMMUNITY_PIPELINES_URL.format(revision=revision, pipeline=pretrained_model_name_or_path)
         try:
-            resolved_module_file = hf_hub_download(
-                repo_id=COMMUNITY_PIPELINES_MIRROR_ID,
-                repo_type="dataset",
-                filename=f"{revision}/{pretrained_model_name_or_path}.py",
+            resolved_module_file = cached_download(
+                github_url,
                 cache_dir=cache_dir,
                 force_download=force_download,
                 proxies=proxies,
+                resume_download=resume_download,
                 local_files_only=local_files_only,
+                use_auth_token=False,
             )
             submodule = "git"
             module_file = pretrained_model_name_or_path + ".py"
-        except RevisionNotFoundError as e:
-            raise EnvironmentError(
-                f"Revision '{revision}' not found in the community pipelines mirror. Check available revisions on"
-                " https://huggingface.co/datasets/diffusers/community-pipelines-mirror/tree/main."
-                " If you don't find the revision you are looking for, please open an issue on https://github.com/huggingface/diffusers/issues."
-            ) from e
         except EnvironmentError:
             logger.error(f"Could not locate the {module_file} inside {pretrained_model_name_or_path}.")
             raise
@@ -311,7 +307,7 @@ def get_cached_module_file(
                 proxies=proxies,
                 resume_download=resume_download,
                 local_files_only=local_files_only,
-                token=token,
+                use_auth_token=use_auth_token,
             )
             submodule = os.path.join("local", "--".join(pretrained_model_name_or_path.split("/")))
         except EnvironmentError:
@@ -331,16 +327,18 @@ def get_cached_module_file(
         # The only reason we do the copy is to avoid putting too many folders in sys.path.
         shutil.copy(resolved_module_file, submodule_path / module_file)
         for module_needed in modules_needed:
-            if len(module_needed.split(".")) == 2:
-                module_needed = "/".join(module_needed.split("."))
-                module_folder = module_needed.split("/")[0]
-                if not os.path.exists(submodule_path / module_folder):
-                    os.makedirs(submodule_path / module_folder)
             module_needed = f"{module_needed}.py"
             shutil.copy(os.path.join(pretrained_model_name_or_path, module_needed), submodule_path / module_needed)
     else:
         # Get the commit hash
         # TODO: we will get this info in the etag soon, so retrieve it from there and not here.
+        if isinstance(use_auth_token, str):
+            token = use_auth_token
+        elif use_auth_token is True:
+            token = HfFolder.get_token()
+        else:
+            token = None
+
         commit_hash = model_info(pretrained_model_name_or_path, revision=revision, token=token).sha
 
         # The module file will end up being placed in a subfolder with the git hash of the repo. This way we get the
@@ -350,16 +348,9 @@ def get_cached_module_file(
         create_dynamic_module(full_submodule)
 
         if not (submodule_path / module_file).exists():
-            if len(module_file.split("/")) == 2:
-                module_folder = module_file.split("/")[0]
-                if not os.path.exists(submodule_path / module_folder):
-                    os.makedirs(submodule_path / module_folder)
             shutil.copy(resolved_module_file, submodule_path / module_file)
-
         # Make sure we also have every file with relative
         for module_needed in modules_needed:
-            if len(module_needed.split(".")) == 2:
-                module_needed = "/".join(module_needed.split("."))
             if not (submodule_path / module_needed).exists():
                 get_cached_module_file(
                     pretrained_model_name_or_path,
@@ -368,23 +359,22 @@ def get_cached_module_file(
                     force_download=force_download,
                     resume_download=resume_download,
                     proxies=proxies,
-                    token=token,
+                    use_auth_token=use_auth_token,
                     revision=revision,
                     local_files_only=local_files_only,
                 )
     return os.path.join(full_submodule, module_file)
 
 
-@validate_hf_hub_args
 def get_class_from_dynamic_module(
     pretrained_model_name_or_path: Union[str, os.PathLike],
     module_file: str,
     class_name: Optional[str] = None,
     cache_dir: Optional[Union[str, os.PathLike]] = None,
     force_download: bool = False,
-    resume_download: Optional[bool] = None,
+    resume_download: bool = False,
     proxies: Optional[Dict[str, str]] = None,
-    token: Optional[Union[bool, str]] = None,
+    use_auth_token: Optional[Union[bool, str]] = None,
     revision: Optional[str] = None,
     local_files_only: bool = False,
     **kwargs,
@@ -419,13 +409,12 @@ def get_class_from_dynamic_module(
         force_download (`bool`, *optional*, defaults to `False`):
             Whether or not to force to (re-)download the configuration files and override the cached versions if they
             exist.
-        resume_download:
-            Deprecated and ignored. All downloads are now resumed by default when possible. Will be removed in v1 of
-            Diffusers.
+        resume_download (`bool`, *optional*, defaults to `False`):
+            Whether or not to delete incompletely received file. Attempts to resume the download if such a file exists.
         proxies (`Dict[str, str]`, *optional*):
             A dictionary of proxy servers to use by protocol or endpoint, e.g., `{'http': 'foo.bar:3128',
             'http://hostname': 'foo.bar:4012'}.` The proxies are used on each request.
-        token (`str` or `bool`, *optional*):
+        use_auth_token (`str` or `bool`, *optional*):
             The token to use as HTTP bearer authorization for remote files. If `True`, will use the token generated
             when running `transformers-cli login` (stored in `~/.huggingface`).
         revision (`str`, *optional*, defaults to `"main"`):
@@ -437,8 +426,8 @@ def get_class_from_dynamic_module(
 
     <Tip>
 
-    You may pass a token in `token` if you are not logged in (`huggingface-cli login`) and want to use private or
-    [gated models](https://huggingface.co/docs/hub/models-gated#gated-models).
+    You may pass a token in `use_auth_token` if you are not logged in (`huggingface-cli long`) and want to use private
+    or [gated models](https://huggingface.co/docs/hub/models-gated#gated-models).
 
     </Tip>
 
@@ -460,7 +449,7 @@ def get_class_from_dynamic_module(
         force_download=force_download,
         resume_download=resume_download,
         proxies=proxies,
-        token=token,
+        use_auth_token=use_auth_token,
         revision=revision,
         local_files_only=local_files_only,
     )

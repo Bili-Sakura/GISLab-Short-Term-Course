@@ -1,28 +1,20 @@
-import functools
-import importlib
 import inspect
-import io
 import logging
-import multiprocessing
 import os
 import random
 import re
-import struct
-import sys
 import tempfile
-import time
 import unittest
 import urllib.parse
-from contextlib import contextmanager
+from distutils.util import strtobool
 from io import BytesIO, StringIO
 from pathlib import Path
-from typing import Callable, Dict, List, Optional, Union
+from typing import List, Optional, Union
 
 import numpy as np
 import PIL.Image
 import PIL.ImageOps
 import requests
-from numpy.linalg import norm
 from packaging import version
 
 from .import_utils import (
@@ -32,12 +24,9 @@ from .import_utils import (
     is_note_seq_available,
     is_onnx_available,
     is_opencv_available,
-    is_peft_available,
-    is_timm_available,
     is_torch_available,
     is_torch_version,
     is_torchsde_available,
-    is_transformers_available,
 )
 from .logging import get_logger
 
@@ -46,38 +35,18 @@ global_rng = random.Random()
 
 logger = get_logger(__name__)
 
-_required_peft_version = is_peft_available() and version.parse(
-    version.parse(importlib.metadata.version("peft")).base_version
-) > version.parse("0.5")
-_required_transformers_version = is_transformers_available() and version.parse(
-    version.parse(importlib.metadata.version("transformers")).base_version
-) > version.parse("4.33")
-
-USE_PEFT_BACKEND = _required_peft_version and _required_transformers_version
-
 if is_torch_available():
     import torch
 
-    # Set a backend environment variable for any extra module import required for a custom accelerator
-    if "DIFFUSERS_TEST_BACKEND" in os.environ:
-        backend = os.environ["DIFFUSERS_TEST_BACKEND"]
-        try:
-            _ = importlib.import_module(backend)
-        except ModuleNotFoundError as e:
-            raise ModuleNotFoundError(
-                f"Failed to import `DIFFUSERS_TEST_BACKEND` '{backend}'! This should be the name of an installed module \
-                    to enable a specified backend.):\n{e}"
-            ) from e
-
     if "DIFFUSERS_TEST_DEVICE" in os.environ:
         torch_device = os.environ["DIFFUSERS_TEST_DEVICE"]
-        try:
-            # try creating device to see if provided device is valid
-            _ = torch.device(torch_device)
-        except RuntimeError as e:
-            raise RuntimeError(
-                f"Unknown testing device specified by environment variable `DIFFUSERS_TEST_DEVICE`: {torch_device}"
-            ) from e
+
+        available_backends = ["cuda", "cpu", "mps"]
+        if torch_device not in available_backends:
+            raise ValueError(
+                f"unknown torch backend for diffusers tests: {torch_device}. Available backends are:"
+                f" {available_backends}"
+            )
         logger.info(f"torch_device overrode to {torch_device}")
     else:
         torch_device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -99,28 +68,10 @@ def torch_all_close(a, b, *args, **kwargs):
     return True
 
 
-def numpy_cosine_similarity_distance(a, b):
-    similarity = np.dot(a, b) / (norm(a) * norm(b))
-    distance = 1.0 - similarity.mean()
-
-    return distance
-
-
-def print_tensor_test(
-    tensor,
-    limit_to_slices=None,
-    max_torch_print=None,
-    filename="test_corrections.txt",
-    expected_tensor_name="expected_slice",
-):
-    if max_torch_print:
-        torch.set_printoptions(threshold=10_000)
-
+def print_tensor_test(tensor, filename="test_corrections.txt", expected_tensor_name="expected_slice"):
     test_name = os.environ.get("PYTEST_CURRENT_TEST")
     if not torch.is_tensor(tensor):
         tensor = torch.from_numpy(tensor)
-    if limit_to_slices:
-        tensor = tensor[0, -3:, -3:, -1]
 
     tensor_str = str(tensor.detach().cpu().flatten().to(torch.float32)).replace("\n", "")
     # format is usually:
@@ -129,7 +80,7 @@ def print_tensor_test(
     test_file, test_class, test_fn = test_name.split("::")
     test_fn = test_fn.split()[0]
     with open(filename, "a") as f:
-        print("::".join([test_file, test_class, test_fn, output_str]), file=f)
+        print(";".join([test_file, test_class, test_fn, output_str]), file=f)
 
 
 def get_tests_dir(append_path=None):
@@ -148,25 +99,9 @@ def get_tests_dir(append_path=None):
         tests_dir = os.path.dirname(tests_dir)
 
     if append_path:
-        return Path(tests_dir, append_path).as_posix()
+        return os.path.join(tests_dir, append_path)
     else:
         return tests_dir
-
-
-# Taken from the following PR:
-# https://github.com/huggingface/accelerate/pull/1964
-def str_to_bool(value) -> int:
-    """
-    Converts a string representation of truth to `True` (1) or `False` (0). True values are `y`, `yes`, `t`, `true`,
-    `on`, and `1`; False value are `n`, `no`, `f`, `false`, `off`, and `0`;
-    """
-    value = value.lower()
-    if value in ("y", "yes", "t", "true", "on", "1"):
-        return 1
-    elif value in ("n", "no", "f", "false", "off", "0"):
-        return 0
-    else:
-        raise ValueError(f"invalid truth value {value}")
 
 
 def parse_flag_from_env(key, default=False):
@@ -178,7 +113,7 @@ def parse_flag_from_env(key, default=False):
     else:
         # KEY is set, convert it to True or False.
         try:
-            _value = str_to_bool(value)
+            _value = strtobool(value)
         except ValueError:
             # More values are supported, but let's keep the message simple.
             raise ValueError(f"If set, {key} must be yes or no.")
@@ -187,7 +122,6 @@ def parse_flag_from_env(key, default=False):
 
 _run_slow_tests = parse_flag_from_env("RUN_SLOW", default=False)
 _run_nightly_tests = parse_flag_from_env("RUN_NIGHTLY", default=False)
-_run_compile_tests = parse_flag_from_env("RUN_COMPILE", default=False)
 
 
 def floats_tensor(shape, scale=1.0, rng=None, name=None):
@@ -226,16 +160,6 @@ def nightly(test_case):
     return unittest.skipUnless(_run_nightly_tests, "test is nightly")(test_case)
 
 
-def is_torch_compile(test_case):
-    """
-    Decorator marking a test that runs compile tests in the diffusers CI.
-
-    Compile tests are skipped by default. Set the RUN_COMPILE environment variable to a truthy value to run them.
-
-    """
-    return unittest.skipUnless(_run_compile_tests, "test is torch compile")(test_case)
-
-
 def require_torch(test_case):
     """
     Decorator marking a test that requires PyTorch. These tests are skipped when PyTorch isn't installed.
@@ -257,50 +181,6 @@ def require_torch_gpu(test_case):
     return unittest.skipUnless(is_torch_available() and torch_device == "cuda", "test requires PyTorch+CUDA")(
         test_case
     )
-
-
-# These decorators are for accelerator-specific behaviours that are not GPU-specific
-def require_torch_accelerator(test_case):
-    """Decorator marking a test that requires an accelerator backend and PyTorch."""
-    return unittest.skipUnless(is_torch_available() and torch_device != "cpu", "test requires accelerator+PyTorch")(
-        test_case
-    )
-
-
-def require_torch_multi_gpu(test_case):
-    """
-    Decorator marking a test that requires a multi-GPU setup (in PyTorch). These tests are skipped on a machine without
-    multiple GPUs. To run *only* the multi_gpu tests, assuming all test names contain multi_gpu: $ pytest -sv ./tests
-    -k "multi_gpu"
-    """
-    if not is_torch_available():
-        return unittest.skip("test requires PyTorch")(test_case)
-
-    import torch
-
-    return unittest.skipUnless(torch.cuda.device_count() > 1, "test requires multiple GPUs")(test_case)
-
-
-def require_torch_accelerator_with_fp16(test_case):
-    """Decorator marking a test that requires an accelerator with support for the FP16 data type."""
-    return unittest.skipUnless(_is_torch_fp16_available(torch_device), "test requires accelerator with fp16 support")(
-        test_case
-    )
-
-
-def require_torch_accelerator_with_fp64(test_case):
-    """Decorator marking a test that requires an accelerator with support for the FP64 data type."""
-    return unittest.skipUnless(_is_torch_fp64_available(torch_device), "test requires accelerator with fp64 support")(
-        test_case
-    )
-
-
-def require_torch_accelerator_with_training(test_case):
-    """Decorator marking a test that requires an accelerator with support for training."""
-    return unittest.skipUnless(
-        is_torch_available() and backend_supports_training(torch_device),
-        "test requires accelerator with training support",
-    )(test_case)
 
 
 def skip_mps(test_case):
@@ -344,68 +224,12 @@ def require_torchsde(test_case):
     return unittest.skipUnless(is_torchsde_available(), "test requires torchsde")(test_case)
 
 
-def require_peft_backend(test_case):
-    """
-    Decorator marking a test that requires PEFT backend, this would require some specific versions of PEFT and
-    transformers.
-    """
-    return unittest.skipUnless(USE_PEFT_BACKEND, "test requires PEFT backend")(test_case)
-
-
-def require_timm(test_case):
-    """
-    Decorator marking a test that requires timm. These tests are skipped when timm isn't installed.
-    """
-    return unittest.skipUnless(is_timm_available(), "test requires timm")(test_case)
-
-
-def require_peft_version_greater(peft_version):
-    """
-    Decorator marking a test that requires PEFT backend with a specific version, this would require some specific
-    versions of PEFT and transformers.
-    """
-
-    def decorator(test_case):
-        correct_peft_version = is_peft_available() and version.parse(
-            version.parse(importlib.metadata.version("peft")).base_version
-        ) > version.parse(peft_version)
-        return unittest.skipUnless(
-            correct_peft_version, f"test requires PEFT backend with the version greater than {peft_version}"
-        )(test_case)
-
-    return decorator
-
-
-def require_accelerate_version_greater(accelerate_version):
-    def decorator(test_case):
-        correct_accelerate_version = is_peft_available() and version.parse(
-            version.parse(importlib.metadata.version("accelerate")).base_version
-        ) > version.parse(accelerate_version)
-        return unittest.skipUnless(
-            correct_accelerate_version, f"Test requires accelerate with the version greater than {accelerate_version}."
-        )(test_case)
-
-    return decorator
-
-
-def deprecate_after_peft_backend(test_case):
-    """
-    Decorator marking a test that will be skipped after PEFT backend
-    """
-    return unittest.skipUnless(not USE_PEFT_BACKEND, "test skipped in favor of PEFT backend")(test_case)
-
-
-def get_python_version():
-    sys_info = sys.version_info
-    major, minor = sys_info.major, sys_info.minor
-    return major, minor
-
-
 def load_numpy(arry: Union[str, np.ndarray], local_path: Optional[str] = None) -> np.ndarray:
     if isinstance(arry, str):
+        # local_path = "/home/patrick_huggingface_co/"
         if local_path is not None:
             # local_path can be passed to correct images of tests
-            return Path(local_path, arry.split("/")[-5], arry.split("/")[-2], arry.split("/")[-1]).as_posix()
+            return os.path.join(local_path, "/".join([arry.split("/")[-5], arry.split("/")[-2], arry.split("/")[-1]]))
         elif arry.startswith("http://") or arry.startswith("https://"):
             response = requests.get(arry)
             response.raise_for_status()
@@ -436,14 +260,12 @@ def load_pt(url: str):
 
 def load_image(image: Union[str, PIL.Image.Image]) -> PIL.Image.Image:
     """
-    Loads `image` to a PIL Image.
-
     Args:
+    Loads `image` to a PIL Image.
         image (`str` or `PIL.Image.Image`):
             The image to convert to the PIL Image format.
     Returns:
-        `PIL.Image.Image`:
-            A PIL Image.
+        `PIL.Image.Image`: A PIL Image.
     """
     if isinstance(image, str):
         if image.startswith("http://") or image.startswith("https://"):
@@ -475,100 +297,6 @@ def preprocess_image(image: PIL.Image, batch_size: int):
     return 2.0 * image - 1.0
 
 
-def export_to_gif(image: List[PIL.Image.Image], output_gif_path: str = None) -> str:
-    if output_gif_path is None:
-        output_gif_path = tempfile.NamedTemporaryFile(suffix=".gif").name
-
-    image[0].save(
-        output_gif_path,
-        save_all=True,
-        append_images=image[1:],
-        optimize=False,
-        duration=100,
-        loop=0,
-    )
-    return output_gif_path
-
-
-@contextmanager
-def buffered_writer(raw_f):
-    f = io.BufferedWriter(raw_f)
-    yield f
-    f.flush()
-
-
-def export_to_ply(mesh, output_ply_path: str = None):
-    """
-    Write a PLY file for a mesh.
-    """
-    if output_ply_path is None:
-        output_ply_path = tempfile.NamedTemporaryFile(suffix=".ply").name
-
-    coords = mesh.verts.detach().cpu().numpy()
-    faces = mesh.faces.cpu().numpy()
-    rgb = np.stack([mesh.vertex_channels[x].detach().cpu().numpy() for x in "RGB"], axis=1)
-
-    with buffered_writer(open(output_ply_path, "wb")) as f:
-        f.write(b"ply\n")
-        f.write(b"format binary_little_endian 1.0\n")
-        f.write(bytes(f"element vertex {len(coords)}\n", "ascii"))
-        f.write(b"property float x\n")
-        f.write(b"property float y\n")
-        f.write(b"property float z\n")
-        if rgb is not None:
-            f.write(b"property uchar red\n")
-            f.write(b"property uchar green\n")
-            f.write(b"property uchar blue\n")
-        if faces is not None:
-            f.write(bytes(f"element face {len(faces)}\n", "ascii"))
-            f.write(b"property list uchar int vertex_index\n")
-        f.write(b"end_header\n")
-
-        if rgb is not None:
-            rgb = (rgb * 255.499).round().astype(int)
-            vertices = [
-                (*coord, *rgb)
-                for coord, rgb in zip(
-                    coords.tolist(),
-                    rgb.tolist(),
-                )
-            ]
-            format = struct.Struct("<3f3B")
-            for item in vertices:
-                f.write(format.pack(*item))
-        else:
-            format = struct.Struct("<3f")
-            for vertex in coords.tolist():
-                f.write(format.pack(*vertex))
-
-        if faces is not None:
-            format = struct.Struct("<B3I")
-            for tri in faces.tolist():
-                f.write(format.pack(len(tri), *tri))
-
-    return output_ply_path
-
-
-def export_to_obj(mesh, output_obj_path: str = None):
-    if output_obj_path is None:
-        output_obj_path = tempfile.NamedTemporaryFile(suffix=".obj").name
-
-    verts = mesh.verts.detach().cpu().numpy()
-    faces = mesh.faces.cpu().numpy()
-
-    vertex_colors = np.stack([mesh.vertex_channels[x].detach().cpu().numpy() for x in "RGB"], axis=1)
-    vertices = [
-        "{} {} {} {} {} {}".format(*coord, *color) for coord, color in zip(verts.tolist(), vertex_colors.tolist())
-    ]
-
-    faces = ["f {} {} {}".format(str(tri[0] + 1), str(tri[1] + 1), str(tri[2] + 1)) for tri in faces.tolist()]
-
-    combined_data = ["v " + vertex for vertex in vertices] + faces
-
-    with open(output_obj_path, "w") as f:
-        f.writelines("\n".join(combined_data))
-
-
 def export_to_video(video_frames: List[np.ndarray], output_video_path: str = None) -> str:
     if is_opencv_available():
         import cv2
@@ -587,10 +315,10 @@ def export_to_video(video_frames: List[np.ndarray], output_video_path: str = Non
 
 
 def load_hf_numpy(path) -> np.ndarray:
-    base_url = "https://huggingface.co/datasets/fusing/diffusers-testing/resolve/main"
-
-    if not path.startswith("http://") and not path.startswith("https://"):
-        path = os.path.join(base_url, urllib.parse.quote(path))
+    if not path.startswith("http://") or path.startswith("https://"):
+        path = os.path.join(
+            "https://huggingface.co/datasets/fusing/diffusers-testing/resolve/main", urllib.parse.quote(path)
+        )
 
     return load_numpy(path)
 
@@ -749,87 +477,6 @@ def pytest_terminal_summary_main(tr, id):
     config.option.tbstyle = orig_tbstyle
 
 
-# Copied from https://github.com/huggingface/transformers/blob/000e52aec8850d3fe2f360adc6fd256e5b47fe4c/src/transformers/testing_utils.py#L1905
-def is_flaky(max_attempts: int = 5, wait_before_retry: Optional[float] = None, description: Optional[str] = None):
-    """
-    To decorate flaky tests. They will be retried on failures.
-
-    Args:
-        max_attempts (`int`, *optional*, defaults to 5):
-            The maximum number of attempts to retry the flaky test.
-        wait_before_retry (`float`, *optional*):
-            If provided, will wait that number of seconds before retrying the test.
-        description (`str`, *optional*):
-            A string to describe the situation (what / where / why is flaky, link to GH issue/PR comments, errors,
-            etc.)
-    """
-
-    def decorator(test_func_ref):
-        @functools.wraps(test_func_ref)
-        def wrapper(*args, **kwargs):
-            retry_count = 1
-
-            while retry_count < max_attempts:
-                try:
-                    return test_func_ref(*args, **kwargs)
-
-                except Exception as err:
-                    print(f"Test failed with {err} at try {retry_count}/{max_attempts}.", file=sys.stderr)
-                    if wait_before_retry is not None:
-                        time.sleep(wait_before_retry)
-                    retry_count += 1
-
-            return test_func_ref(*args, **kwargs)
-
-        return wrapper
-
-    return decorator
-
-
-# Taken from: https://github.com/huggingface/transformers/blob/3658488ff77ff8d45101293e749263acf437f4d5/src/transformers/testing_utils.py#L1787
-def run_test_in_subprocess(test_case, target_func, inputs=None, timeout=None):
-    """
-    To run a test in a subprocess. In particular, this can avoid (GPU) memory issue.
-
-    Args:
-        test_case (`unittest.TestCase`):
-            The test that will run `target_func`.
-        target_func (`Callable`):
-            The function implementing the actual testing logic.
-        inputs (`dict`, *optional*, defaults to `None`):
-            The inputs that will be passed to `target_func` through an (input) queue.
-        timeout (`int`, *optional*, defaults to `None`):
-            The timeout (in seconds) that will be passed to the input and output queues. If not specified, the env.
-            variable `PYTEST_TIMEOUT` will be checked. If still `None`, its value will be set to `600`.
-    """
-    if timeout is None:
-        timeout = int(os.environ.get("PYTEST_TIMEOUT", 600))
-
-    start_methohd = "spawn"
-    ctx = multiprocessing.get_context(start_methohd)
-
-    input_queue = ctx.Queue(1)
-    output_queue = ctx.JoinableQueue(1)
-
-    # We can't send `unittest.TestCase` to the child, otherwise we get issues regarding pickle.
-    input_queue.put(inputs, timeout=timeout)
-
-    process = ctx.Process(target=target_func, args=(input_queue, output_queue, timeout))
-    process.start()
-    # Kill the child process if we can't get outputs from it in time: otherwise, the hanging subprocess prevents
-    # the test to exit properly.
-    try:
-        results = output_queue.get(timeout=timeout)
-        output_queue.task_done()
-    except Exception as e:
-        process.terminate()
-        test_case.fail(e)
-    process.join(timeout=timeout)
-
-    if results["error"] is not None:
-        test_case.fail(f'{results["error"]}')
-
-
 class CaptureLogger:
     """
     Args:
@@ -867,169 +514,3 @@ class CaptureLogger:
 
     def __repr__(self):
         return f"captured: {self.out}\n"
-
-
-def enable_full_determinism():
-    """
-    Helper function for reproducible behavior during distributed training. See
-    - https://pytorch.org/docs/stable/notes/randomness.html for pytorch
-    """
-    #  Enable PyTorch deterministic mode. This potentially requires either the environment
-    #  variable 'CUDA_LAUNCH_BLOCKING' or 'CUBLAS_WORKSPACE_CONFIG' to be set,
-    # depending on the CUDA version, so we set them both here
-    os.environ["CUDA_LAUNCH_BLOCKING"] = "1"
-    os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":16:8"
-    torch.use_deterministic_algorithms(True)
-
-    # Enable CUDNN deterministic mode
-    torch.backends.cudnn.deterministic = True
-    torch.backends.cudnn.benchmark = False
-    torch.backends.cuda.matmul.allow_tf32 = False
-
-
-def disable_full_determinism():
-    os.environ["CUDA_LAUNCH_BLOCKING"] = "0"
-    os.environ["CUBLAS_WORKSPACE_CONFIG"] = ""
-    torch.use_deterministic_algorithms(False)
-
-
-# Utils for custom and alternative accelerator devices
-def _is_torch_fp16_available(device):
-    if not is_torch_available():
-        return False
-
-    import torch
-
-    device = torch.device(device)
-
-    try:
-        x = torch.zeros((2, 2), dtype=torch.float16).to(device)
-        _ = torch.mul(x, x)
-        return True
-
-    except Exception as e:
-        if device.type == "cuda":
-            raise ValueError(
-                f"You have passed a device of type 'cuda' which should work with 'fp16', but 'cuda' does not seem to be correctly installed on your machine: {e}"
-            )
-
-        return False
-
-
-def _is_torch_fp64_available(device):
-    if not is_torch_available():
-        return False
-
-    import torch
-
-    device = torch.device(device)
-
-    try:
-        x = torch.zeros((2, 2), dtype=torch.float64).to(device)
-        _ = torch.mul(x, x)
-        return True
-
-    except Exception as e:
-        if device.type == "cuda":
-            raise ValueError(
-                f"You have passed a device of type 'cuda' which should work with 'fp64', but 'cuda' does not seem to be correctly installed on your machine: {e}"
-            )
-
-        return False
-
-
-# Guard these lookups for when Torch is not used - alternative accelerator support is for PyTorch
-if is_torch_available():
-    # Behaviour flags
-    BACKEND_SUPPORTS_TRAINING = {"cuda": True, "cpu": True, "mps": False, "default": True}
-
-    # Function definitions
-    BACKEND_EMPTY_CACHE = {"cuda": torch.cuda.empty_cache, "cpu": None, "mps": None, "default": None}
-    BACKEND_DEVICE_COUNT = {"cuda": torch.cuda.device_count, "cpu": lambda: 0, "mps": lambda: 0, "default": 0}
-    BACKEND_MANUAL_SEED = {"cuda": torch.cuda.manual_seed, "cpu": torch.manual_seed, "default": torch.manual_seed}
-
-
-# This dispatches a defined function according to the accelerator from the function definitions.
-def _device_agnostic_dispatch(device: str, dispatch_table: Dict[str, Callable], *args, **kwargs):
-    if device not in dispatch_table:
-        return dispatch_table["default"](*args, **kwargs)
-
-    fn = dispatch_table[device]
-
-    # Some device agnostic functions return values. Need to guard against 'None' instead at
-    # user level
-    if fn is None:
-        return None
-
-    return fn(*args, **kwargs)
-
-
-# These are callables which automatically dispatch the function specific to the accelerator
-def backend_manual_seed(device: str, seed: int):
-    return _device_agnostic_dispatch(device, BACKEND_MANUAL_SEED, seed)
-
-
-def backend_empty_cache(device: str):
-    return _device_agnostic_dispatch(device, BACKEND_EMPTY_CACHE)
-
-
-def backend_device_count(device: str):
-    return _device_agnostic_dispatch(device, BACKEND_DEVICE_COUNT)
-
-
-# These are callables which return boolean behaviour flags and can be used to specify some
-# device agnostic alternative where the feature is unsupported.
-def backend_supports_training(device: str):
-    if not is_torch_available():
-        return False
-
-    if device not in BACKEND_SUPPORTS_TRAINING:
-        device = "default"
-
-    return BACKEND_SUPPORTS_TRAINING[device]
-
-
-# Guard for when Torch is not available
-if is_torch_available():
-    # Update device function dict mapping
-    def update_mapping_from_spec(device_fn_dict: Dict[str, Callable], attribute_name: str):
-        try:
-            # Try to import the function directly
-            spec_fn = getattr(device_spec_module, attribute_name)
-            device_fn_dict[torch_device] = spec_fn
-        except AttributeError as e:
-            # If the function doesn't exist, and there is no default, throw an error
-            if "default" not in device_fn_dict:
-                raise AttributeError(
-                    f"`{attribute_name}` not found in '{device_spec_path}' and no default fallback function found."
-                ) from e
-
-    if "DIFFUSERS_TEST_DEVICE_SPEC" in os.environ:
-        device_spec_path = os.environ["DIFFUSERS_TEST_DEVICE_SPEC"]
-        if not Path(device_spec_path).is_file():
-            raise ValueError(f"Specified path to device specification file is not found. Received {device_spec_path}")
-
-        try:
-            import_name = device_spec_path[: device_spec_path.index(".py")]
-        except ValueError as e:
-            raise ValueError(f"Provided device spec file is not a Python file! Received {device_spec_path}") from e
-
-        device_spec_module = importlib.import_module(import_name)
-
-        try:
-            device_name = device_spec_module.DEVICE_NAME
-        except AttributeError:
-            raise AttributeError("Device spec file did not contain `DEVICE_NAME`")
-
-        if "DIFFUSERS_TEST_DEVICE" in os.environ and torch_device != device_name:
-            msg = f"Mismatch between environment variable `DIFFUSERS_TEST_DEVICE` '{torch_device}' and device found in spec '{device_name}'\n"
-            msg += "Either unset `DIFFUSERS_TEST_DEVICE` or ensure it matches device spec name."
-            raise ValueError(msg)
-
-        torch_device = device_name
-
-        # Add one entry here for each `BACKEND_*` dictionary.
-        update_mapping_from_spec(BACKEND_MANUAL_SEED, "MANUAL_SEED_FN")
-        update_mapping_from_spec(BACKEND_EMPTY_CACHE, "EMPTY_CACHE_FN")
-        update_mapping_from_spec(BACKEND_DEVICE_COUNT, "DEVICE_COUNT_FN")
-        update_mapping_from_spec(BACKEND_SUPPORTS_TRAINING, "SUPPORTS_TRAINING")
