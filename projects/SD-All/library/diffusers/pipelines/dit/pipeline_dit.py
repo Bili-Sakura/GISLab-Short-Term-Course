@@ -4,7 +4,7 @@
 # Copyright (c) 2021 OpenAI
 # MIT License
 #
-# Copyright 2024 The HuggingFace Team. All rights reserved.
+# Copyright 2023 The HuggingFace Team. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,33 +22,29 @@ from typing import Dict, List, Optional, Tuple, Union
 
 import torch
 
-from ...models import AutoencoderKL, DiTTransformer2DModel
+from ...models import AutoencoderKL, Transformer2DModel
 from ...schedulers import KarrasDiffusionSchedulers
-from ...utils.torch_utils import randn_tensor
+from ...utils import randn_tensor
 from ..pipeline_utils import DiffusionPipeline, ImagePipelineOutput
 
 
 class DiTPipeline(DiffusionPipeline):
     r"""
-    Pipeline for image generation based on a Transformer backbone instead of a UNet.
-
-    This model inherits from [`DiffusionPipeline`]. Check the superclass documentation for the generic methods
-    implemented for all pipelines (downloading, saving, running on a particular device, etc.).
+    This pipeline inherits from [`DiffusionPipeline`]. Check the superclass documentation for the generic methods the
+    library implements for all the pipelines (such as downloading or saving, running on a particular device, etc.)
 
     Parameters:
-        transformer ([`DiTTransformer2DModel`]):
-            A class conditioned `DiTTransformer2DModel` to denoise the encoded image latents.
+        transformer ([`Transformer2DModel`]):
+            Class conditioned Transformer in Diffusion model to denoise the encoded image latents.
         vae ([`AutoencoderKL`]):
-            Variational Auto-Encoder (VAE) model to encode and decode images to and from latent representations.
+            Variational Auto-Encoder (VAE) Model to encode and decode images to and from latent representations.
         scheduler ([`DDIMScheduler`]):
-            A scheduler to be used in combination with `transformer` to denoise the encoded image latents.
+            A scheduler to be used in combination with `dit` to denoise the encoded image latents.
     """
-
-    model_cpu_offload_seq = "transformer->vae"
 
     def __init__(
         self,
-        transformer: DiTTransformer2DModel,
+        transformer: Transformer2DModel,
         vae: AutoencoderKL,
         scheduler: KarrasDiffusionSchedulers,
         id2label: Optional[Dict[int, str]] = None,
@@ -67,15 +63,13 @@ class DiTPipeline(DiffusionPipeline):
     def get_label_ids(self, label: Union[str, List[str]]) -> List[int]:
         r"""
 
-        Map label strings from ImageNet to corresponding class ids.
+        Map label strings, *e.g.* from ImageNet, to corresponding class ids.
 
         Parameters:
-            label (`str` or `dict` of `str`):
-                Label strings to be mapped to class ids.
+            label (`str` or `dict` of `str`): label strings to be mapped to class ids.
 
         Returns:
-            `list` of `int`:
-                Class ids to be processed by pipeline.
+            `list` of `int`: Class ids to be processed by pipeline.
         """
 
         if not isinstance(label, list):
@@ -100,53 +94,24 @@ class DiTPipeline(DiffusionPipeline):
         return_dict: bool = True,
     ) -> Union[ImagePipelineOutput, Tuple]:
         r"""
-        The call function to the pipeline for generation.
+        Function invoked when calling the pipeline for generation.
 
         Args:
             class_labels (List[int]):
-                List of ImageNet class labels for the images to be generated.
+                List of imagenet class labels for the images to be generated.
             guidance_scale (`float`, *optional*, defaults to 4.0):
-                A higher guidance scale value encourages the model to generate images closely linked to the text
-                `prompt` at the expense of lower image quality. Guidance scale is enabled when `guidance_scale > 1`.
+                Scale of the guidance signal.
             generator (`torch.Generator`, *optional*):
-                A [`torch.Generator`](https://pytorch.org/docs/stable/generated/torch.Generator.html) to make
-                generation deterministic.
+                A [torch generator](https://pytorch.org/docs/stable/generated/torch.Generator.html) to make generation
+                deterministic.
             num_inference_steps (`int`, *optional*, defaults to 250):
                 The number of denoising steps. More denoising steps usually lead to a higher quality image at the
                 expense of slower inference.
             output_type (`str`, *optional*, defaults to `"pil"`):
-                The output format of the generated image. Choose between `PIL.Image` or `np.array`.
+                The output format of the generate image. Choose between
+                [PIL](https://pillow.readthedocs.io/en/stable/): `PIL.Image.Image` or `np.array`.
             return_dict (`bool`, *optional*, defaults to `True`):
                 Whether or not to return a [`ImagePipelineOutput`] instead of a plain tuple.
-
-        Examples:
-
-        ```py
-        >>> from diffusers import DiTPipeline, DPMSolverMultistepScheduler
-        >>> import torch
-
-        >>> pipe = DiTPipeline.from_pretrained("facebook/DiT-XL-2-256", torch_dtype=torch.float16)
-        >>> pipe.scheduler = DPMSolverMultistepScheduler.from_config(pipe.scheduler.config)
-        >>> pipe = pipe.to("cuda")
-
-        >>> # pick words from Imagenet class labels
-        >>> pipe.labels  # to print all available words
-
-        >>> # pick words that exist in ImageNet
-        >>> words = ["white shark", "umbrella"]
-
-        >>> class_ids = pipe.get_label_ids(words)
-
-        >>> generator = torch.manual_seed(33)
-        >>> output = pipe(class_labels=class_ids, num_inference_steps=25, generator=generator)
-
-        >>> image = output.images[0]  # label 'white shark'
-        ```
-
-        Returns:
-            [`~pipelines.ImagePipelineOutput`] or `tuple`:
-                If `return_dict` is `True`, [`~pipelines.ImagePipelineOutput`] is returned, otherwise a `tuple` is
-                returned where the first element is a list with the generated images
         """
 
         batch_size = len(class_labels)
@@ -156,17 +121,18 @@ class DiTPipeline(DiffusionPipeline):
         latents = randn_tensor(
             shape=(batch_size, latent_channels, latent_size, latent_size),
             generator=generator,
-            device=self._execution_device,
+            device=self.device,
             dtype=self.transformer.dtype,
         )
         latent_model_input = torch.cat([latents] * 2) if guidance_scale > 1 else latents
 
-        class_labels = torch.tensor(class_labels, device=self._execution_device).reshape(-1)
-        class_null = torch.tensor([1000] * batch_size, device=self._execution_device)
+        class_labels = torch.tensor(class_labels, device=self.device).reshape(-1)
+        class_null = torch.tensor([1000] * batch_size, device=self.device)
         class_labels_input = torch.cat([class_labels, class_null], 0) if guidance_scale > 1 else class_labels
 
         # set step values
         self.scheduler.set_timesteps(num_inference_steps)
+
         for t in self.progress_bar(self.scheduler.timesteps):
             if guidance_scale > 1:
                 half = latent_model_input[: len(latent_model_input) // 2]
@@ -226,9 +192,6 @@ class DiTPipeline(DiffusionPipeline):
 
         if output_type == "pil":
             samples = self.numpy_to_pil(samples)
-
-        # Offload all models
-        self.maybe_free_model_hooks()
 
         if not return_dict:
             return (samples,)

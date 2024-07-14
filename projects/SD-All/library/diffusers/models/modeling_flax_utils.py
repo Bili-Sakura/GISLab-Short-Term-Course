@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2024 The HuggingFace Inc. team.
+# Copyright 2023 The HuggingFace Inc. team.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,22 +23,17 @@ import msgpack.exceptions
 from flax.core.frozen_dict import FrozenDict, unfreeze
 from flax.serialization import from_bytes, to_bytes
 from flax.traverse_util import flatten_dict, unflatten_dict
-from huggingface_hub import create_repo, hf_hub_download
-from huggingface_hub.utils import (
-    EntryNotFoundError,
-    RepositoryNotFoundError,
-    RevisionNotFoundError,
-    validate_hf_hub_args,
-)
+from huggingface_hub import hf_hub_download
+from huggingface_hub.utils import EntryNotFoundError, RepositoryNotFoundError, RevisionNotFoundError
 from requests import HTTPError
 
 from .. import __version__, is_torch_available
 from ..utils import (
     CONFIG_NAME,
+    DIFFUSERS_CACHE,
     FLAX_WEIGHTS_NAME,
     HUGGINGFACE_CO_RESOLVE_ENDPOINT,
     WEIGHTS_NAME,
-    PushToHubMixin,
     logging,
 )
 from .modeling_flax_pytorch_utils import convert_pytorch_state_dict_to_flax
@@ -47,16 +42,13 @@ from .modeling_flax_pytorch_utils import convert_pytorch_state_dict_to_flax
 logger = logging.get_logger(__name__)
 
 
-class FlaxModelMixin(PushToHubMixin):
+class FlaxModelMixin:
     r"""
-    Base class for all Flax models.
+    Base class for all flax models.
 
-    [`FlaxModelMixin`] takes care of storing the model configuration and provides methods for loading, downloading and
-    saving models.
-
-        - **config_name** ([`str`]) -- Filename to save a model to when calling [`~FlaxModelMixin.save_pretrained`].
+    [`FlaxModelMixin`] takes care of storing the configuration of the models and handles methods for loading,
+    downloading and saving models.
     """
-
     config_name = CONFIG_NAME
     _automatically_saved_args = ["_diffusers_version", "_class_name", "_name_or_path"]
     _flax_internal_args = ["name", "parent", "dtype"]
@@ -97,15 +89,15 @@ class FlaxModelMixin(PushToHubMixin):
         Cast the floating-point `params` to `jax.numpy.bfloat16`. This returns a new `params` tree and does not cast
         the `params` in place.
 
-        This method can be used on a TPU to explicitly convert the model parameters to bfloat16 precision to do full
+        This method can be used on TPU to explicitly convert the model parameters to bfloat16 precision to do full
         half-precision training or to save weights in bfloat16 for inference in order to save memory and improve speed.
 
         Arguments:
             params (`Union[Dict, FrozenDict]`):
                 A `PyTree` of model parameters.
             mask (`Union[Dict, FrozenDict]`):
-                A `PyTree` with same structure as the `params` tree. The leaves should be booleans. It should be `True`
-                for params you want to cast, and `False` for those you want to skip.
+                A `PyTree` with same structure as the `params` tree. The leaves should be booleans, `True` for params
+                you want to cast, and should be `False` for those you want to skip.
 
         Examples:
 
@@ -140,8 +132,8 @@ class FlaxModelMixin(PushToHubMixin):
             params (`Union[Dict, FrozenDict]`):
                 A `PyTree` of model parameters.
             mask (`Union[Dict, FrozenDict]`):
-                A `PyTree` with same structure as the `params` tree. The leaves should be booleans. It should be `True`
-                for params you want to cast, and `False` for those you want to skip.
+                A `PyTree` with same structure as the `params` tree. The leaves should be booleans, `True` for params
+                you want to cast, and should be `False` for those you want to skip
 
         Examples:
 
@@ -163,15 +155,15 @@ class FlaxModelMixin(PushToHubMixin):
         Cast the floating-point `params` to `jax.numpy.float16`. This returns a new `params` tree and does not cast the
         `params` in place.
 
-        This method can be used on a GPU to explicitly convert the model parameters to float16 precision to do full
+        This method can be used on GPU to explicitly convert the model parameters to float16 precision to do full
         half-precision training or to save weights in float16 for inference in order to save memory and improve speed.
 
         Arguments:
             params (`Union[Dict, FrozenDict]`):
                 A `PyTree` of model parameters.
             mask (`Union[Dict, FrozenDict]`):
-                A `PyTree` with same structure as the `params` tree. The leaves should be booleans. It should be `True`
-                for params you want to cast, and `False` for those you want to skip.
+                A `PyTree` with same structure as the `params` tree. The leaves should be booleans, `True` for params
+                you want to cast, and should be `False` for those you want to skip
 
         Examples:
 
@@ -197,11 +189,10 @@ class FlaxModelMixin(PushToHubMixin):
         ```"""
         return self._cast_floating_to(params, jnp.float16, mask)
 
-    def init_weights(self, rng: jax.Array) -> Dict:
+    def init_weights(self, rng: jax.random.KeyArray) -> Dict:
         raise NotImplementedError(f"init_weights method has to be implemented for {self}")
 
     @classmethod
-    @validate_hf_hub_args
     def from_pretrained(
         cls,
         pretrained_model_name_or_path: Union[str, os.PathLike],
@@ -210,68 +201,71 @@ class FlaxModelMixin(PushToHubMixin):
         **kwargs,
     ):
         r"""
-        Instantiate a pretrained Flax model from a pretrained model configuration.
+        Instantiate a pretrained flax model from a pre-trained model configuration.
+
+        The warning *Weights from XXX not initialized from pretrained model* means that the weights of XXX do not come
+        pretrained with the rest of the model. It is up to you to train those weights with a downstream fine-tuning
+        task.
+
+        The warning *Weights from XXX not used in YYY* means that the layer XXX is not used by YYY, therefore those
+        weights are discarded.
 
         Parameters:
             pretrained_model_name_or_path (`str` or `os.PathLike`):
                 Can be either:
 
-                    - A string, the *model id* (for example `runwayml/stable-diffusion-v1-5`) of a pretrained model
-                      hosted on the Hub.
-                    - A path to a *directory* (for example `./my_model_directory`) containing the model weights saved
-                      using [`~FlaxModelMixin.save_pretrained`].
+                    - A string, the *model id* of a pretrained model hosted inside a model repo on huggingface.co.
+                      Valid model ids are namespaced under a user or organization name, like
+                      `runwayml/stable-diffusion-v1-5`.
+                    - A path to a *directory* containing model weights saved using [`~ModelMixin.save_pretrained`],
+                      e.g., `./my_model_directory/`.
             dtype (`jax.numpy.dtype`, *optional*, defaults to `jax.numpy.float32`):
                 The data type of the computation. Can be one of `jax.numpy.float32`, `jax.numpy.float16` (on GPUs) and
                 `jax.numpy.bfloat16` (on TPUs).
 
                 This can be used to enable mixed-precision training or half-precision inference on GPUs or TPUs. If
-                specified, all the computation will be performed with the given `dtype`.
+                specified all the computation will be performed with the given `dtype`.
 
-                <Tip>
+                **Note that this only specifies the dtype of the computation and does not influence the dtype of model
+                parameters.**
 
-                This only specifies the dtype of the *computation* and does not influence the dtype of model
-                parameters.
-
-                If you wish to change the dtype of the model parameters, see [`~FlaxModelMixin.to_fp16`] and
-                [`~FlaxModelMixin.to_bf16`].
-
-                </Tip>
-
+                If you wish to change the dtype of the model parameters, see [`~ModelMixin.to_fp16`] and
+                [`~ModelMixin.to_bf16`].
             model_args (sequence of positional arguments, *optional*):
-                All remaining positional arguments are passed to the underlying model's `__init__` method.
+                All remaining positional arguments will be passed to the underlying model's `__init__` method.
             cache_dir (`Union[str, os.PathLike]`, *optional*):
-                Path to a directory where a downloaded pretrained model configuration is cached if the standard cache
-                is not used.
+                Path to a directory in which a downloaded pretrained model configuration should be cached if the
+                standard cache should not be used.
             force_download (`bool`, *optional*, defaults to `False`):
                 Whether or not to force the (re-)download of the model weights and configuration files, overriding the
                 cached versions if they exist.
-            resume_download:
-                Deprecated and ignored. All downloads are now resumed by default when possible. Will be removed in v1
-                of Diffusers.
+            resume_download (`bool`, *optional*, defaults to `False`):
+                Whether or not to delete incompletely received files. Will attempt to resume the download if such a
+                file exists.
             proxies (`Dict[str, str]`, *optional*):
-                A dictionary of proxy servers to use by protocol or endpoint, for example, `{'http': 'foo.bar:3128',
+                A dictionary of proxy servers to use by protocol or endpoint, e.g., `{'http': 'foo.bar:3128',
                 'http://hostname': 'foo.bar:4012'}`. The proxies are used on each request.
             local_files_only(`bool`, *optional*, defaults to `False`):
-                Whether to only load local model weights and configuration files or not. If set to `True`, the model
-                won't be downloaded from the Hub.
+                Whether or not to only look at local files (i.e., do not try to download the model).
             revision (`str`, *optional*, defaults to `"main"`):
-                The specific model version to use. It can be a branch name, a tag name, a commit id, or any identifier
-                allowed by Git.
+                The specific model version to use. It can be a branch name, a tag name, or a commit id, since we use a
+                git-based system for storing models and other artifacts on huggingface.co, so `revision` can be any
+                identifier allowed by git.
             from_pt (`bool`, *optional*, defaults to `False`):
                 Load the model weights from a PyTorch checkpoint save file.
             kwargs (remaining dictionary of keyword arguments, *optional*):
-                Can be used to update the configuration object (after it is loaded) and initiate the model (for
-                example, `output_attentions=True`). Behaves differently depending on whether a `config` is provided or
+                Can be used to update the configuration object (after it being loaded) and initiate the model (e.g.,
+                `output_attentions=True`). Behaves differently depending on whether a `config` is provided or
                 automatically loaded:
 
-                    - If a configuration is provided with `config`, `kwargs` are directly passed to the underlying
-                      model's `__init__` method (we assume all relevant updates to the configuration have already been
-                      done).
-                    - If a configuration is not provided, `kwargs` are first passed to the configuration class
-                      initialization function [`~ConfigMixin.from_config`]. Each key of the `kwargs` that corresponds
-                      to a configuration attribute is used to override said attribute with the supplied `kwargs` value.
-                      Remaining keys that do not correspond to any configuration attribute are passed to the underlying
-                      model's `__init__` function.
+                    - If a configuration is provided with `config`, `**kwargs` will be directly passed to the
+                      underlying model's `__init__` method (we assume all relevant updates to the configuration have
+                      already been done)
+                    - If a configuration is not provided, `kwargs` will be first passed to the configuration class
+                      initialization function ([`~ConfigMixin.from_config`]). Each key of `kwargs` that corresponds to
+                      a configuration attribute will be used to override said attribute with the supplied `kwargs`
+                      value. Remaining keys that do not correspond to any configuration attribute will be passed to the
+                      underlying model's `__init__` function.
 
         Examples:
 
@@ -282,24 +276,15 @@ class FlaxModelMixin(PushToHubMixin):
         >>> model, params = FlaxUNet2DConditionModel.from_pretrained("runwayml/stable-diffusion-v1-5")
         >>> # Model was saved using *save_pretrained('./test/saved_model/')* (for example purposes, not runnable).
         >>> model, params = FlaxUNet2DConditionModel.from_pretrained("./test/saved_model/")
-        ```
-
-        If you get the error message below, you need to finetune the weights for your downstream task:
-
-        ```bash
-        Some weights of UNet2DConditionModel were not initialized from the model checkpoint at runwayml/stable-diffusion-v1-5 and are newly initialized because the shapes did not match:
-        - conv_in.weight: found shape torch.Size([320, 4, 3, 3]) in the checkpoint and torch.Size([320, 9, 3, 3]) in the model instantiated
-        You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
-        ```
-        """
+        ```"""
         config = kwargs.pop("config", None)
-        cache_dir = kwargs.pop("cache_dir", None)
+        cache_dir = kwargs.pop("cache_dir", DIFFUSERS_CACHE)
         force_download = kwargs.pop("force_download", False)
         from_pt = kwargs.pop("from_pt", False)
-        resume_download = kwargs.pop("resume_download", None)
+        resume_download = kwargs.pop("resume_download", False)
         proxies = kwargs.pop("proxies", None)
         local_files_only = kwargs.pop("local_files_only", False)
-        token = kwargs.pop("token", None)
+        use_auth_token = kwargs.pop("use_auth_token", None)
         revision = kwargs.pop("revision", None)
         subfolder = kwargs.pop("subfolder", None)
 
@@ -309,23 +294,23 @@ class FlaxModelMixin(PushToHubMixin):
             "framework": "flax",
         }
 
-        # Load config if we don't provide one
-        if config is None:
-            config, unused_kwargs = cls.load_config(
-                pretrained_model_name_or_path,
-                cache_dir=cache_dir,
-                return_unused_kwargs=True,
-                force_download=force_download,
-                resume_download=resume_download,
-                proxies=proxies,
-                local_files_only=local_files_only,
-                token=token,
-                revision=revision,
-                subfolder=subfolder,
-                **kwargs,
-            )
-
-        model, model_kwargs = cls.from_config(config, dtype=dtype, return_unused_kwargs=True, **unused_kwargs)
+        # Load config if we don't provide a configuration
+        config_path = config if config is not None else pretrained_model_name_or_path
+        model, model_kwargs = cls.from_config(
+            config_path,
+            cache_dir=cache_dir,
+            return_unused_kwargs=True,
+            force_download=force_download,
+            resume_download=resume_download,
+            proxies=proxies,
+            local_files_only=local_files_only,
+            use_auth_token=use_auth_token,
+            revision=revision,
+            subfolder=subfolder,
+            # model args
+            dtype=dtype,
+            **kwargs,
+        )
 
         # Load model
         pretrained_path_with_subfolder = (
@@ -364,7 +349,7 @@ class FlaxModelMixin(PushToHubMixin):
                     proxies=proxies,
                     resume_download=resume_download,
                     local_files_only=local_files_only,
-                    token=token,
+                    use_auth_token=use_auth_token,
                     user_agent=user_agent,
                     subfolder=subfolder,
                     revision=revision,
@@ -374,7 +359,7 @@ class FlaxModelMixin(PushToHubMixin):
                 raise EnvironmentError(
                     f"{pretrained_model_name_or_path} is not a local folder and is not a valid model identifier "
                     "listed on 'https://huggingface.co/models'\nIf this is a private repository, make sure to pass a "
-                    "token having permission to this repo with `token` or log in with `huggingface-cli "
+                    "token having permission to this repo with `use_auth_token` or log in with `huggingface-cli "
                     "login`."
                 )
             except RevisionNotFoundError:
@@ -442,7 +427,7 @@ class FlaxModelMixin(PushToHubMixin):
             # make sure all arrays are stored as jnp.ndarray
             # NOTE: This is to prevent a bug this will be fixed in Flax >= v0.3.4:
             # https://github.com/google/flax/issues/1261
-        state = jax.tree_util.tree_map(lambda x: jax.device_put(x, jax.local_devices(backend="cpu")[0]), state)
+        state = jax.tree_util.tree_map(lambda x: jax.device_put(x, jax.devices("cpu")[0]), state)
 
         # flatten dicts
         state = flatten_dict(state)
@@ -504,42 +489,26 @@ class FlaxModelMixin(PushToHubMixin):
         save_directory: Union[str, os.PathLike],
         params: Union[Dict, FrozenDict],
         is_main_process: bool = True,
-        push_to_hub: bool = False,
-        **kwargs,
     ):
         """
-        Save a model and its configuration file to a directory so that it can be reloaded using the
-        [`~FlaxModelMixin.from_pretrained`] class method.
+        Save a model and its configuration file to a directory, so that it can be re-loaded using the
+        `[`~FlaxModelMixin.from_pretrained`]` class method
 
         Arguments:
             save_directory (`str` or `os.PathLike`):
-                Directory to save a model and its configuration file to. Will be created if it doesn't exist.
+                Directory to which to save. Will be created if it doesn't exist.
             params (`Union[Dict, FrozenDict]`):
                 A `PyTree` of model parameters.
             is_main_process (`bool`, *optional*, defaults to `True`):
-                Whether the process calling this is the main process or not. Useful during distributed training and you
-                need to call this function on all processes. In this case, set `is_main_process=True` only on the main
-                process to avoid race conditions.
-            push_to_hub (`bool`, *optional*, defaults to `False`):
-                Whether or not to push your model to the Hugging Face model hub after saving it. You can specify the
-                repository you want to push to with `repo_id` (will default to the name of `save_directory` in your
-                namespace).
-            kwargs (`Dict[str, Any]`, *optional*):
-                Additional key word arguments passed along to the [`~utils.PushToHubMixin.push_to_hub`] method.
+                Whether the process calling this is the main process or not. Useful when in distributed training like
+                TPUs and need to call this function on all processes. In this case, set `is_main_process=True` only on
+                the main process to avoid race conditions.
         """
         if os.path.isfile(save_directory):
             logger.error(f"Provided path ({save_directory}) should be a directory, not a file")
             return
 
         os.makedirs(save_directory, exist_ok=True)
-
-        if push_to_hub:
-            commit_message = kwargs.pop("commit_message", None)
-            private = kwargs.pop("private", False)
-            create_pr = kwargs.pop("create_pr", False)
-            token = kwargs.pop("token", None)
-            repo_id = kwargs.pop("repo_id", save_directory.split(os.path.sep)[-1])
-            repo_id = create_repo(repo_id, exist_ok=True, private=private, token=token).repo_id
 
         model_to_save = self
 
@@ -555,12 +524,3 @@ class FlaxModelMixin(PushToHubMixin):
             f.write(model_bytes)
 
         logger.info(f"Model weights saved in {output_model_file}")
-
-        if push_to_hub:
-            self._upload_folder(
-                save_directory,
-                repo_id,
-                token=token,
-                commit_message=commit_message,
-                create_pr=create_pr,
-            )

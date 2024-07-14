@@ -5,48 +5,89 @@ from typing import Callable, List, Optional, Union
 import torch
 from transformers import CLIPImageProcessor, CLIPTextModel, CLIPTokenizer
 
-from ...image_processor import VaeImageProcessor
 from ...models import AutoencoderKL, UNet2DConditionModel
+from ...pipeline_utils import DiffusionPipeline
 from ...pipelines.stable_diffusion.safety_checker import StableDiffusionSafetyChecker
 from ...schedulers import KarrasDiffusionSchedulers
-from ...utils import deprecate, logging
-from ...utils.torch_utils import randn_tensor
-from ..pipeline_utils import DiffusionPipeline, StableDiffusionMixin
-from .pipeline_output import SemanticStableDiffusionPipelineOutput
+from ...utils import logging, randn_tensor
+from . import SemanticStableDiffusionPipelineOutput
 
 
 logger = logging.get_logger(__name__)  # pylint: disable=invalid-name
+EXAMPLE_DOC_STRING = """
+    Examples:
+        ```py
+        >>> import torch
+        >>> from diffusers import SemanticStableDiffusionPipeline
+
+        >>> pipe = SemanticStableDiffusionPipeline.from_pretrained(
+        ...     "runwayml/stable-diffusion-v1-5", torch_dtype=torch.float16
+        ... )
+        >>> pipe = pipe.to("cuda")
+
+        >>> out = pipe(
+        ...     prompt="a photo of the face of a woman",
+        ...     num_images_per_prompt=1,
+        ...     guidance_scale=7,
+        ...     editing_prompt=[
+        ...         "smiling, smile",  # Concepts to apply
+        ...         "glasses, wearing glasses",
+        ...         "curls, wavy hair, curly hair",
+        ...         "beard, full beard, mustache",
+        ...     ],
+        ...     reverse_editing_direction=[
+        ...         False,
+        ...         False,
+        ...         False,
+        ...         False,
+        ...     ],  # Direction of guidance i.e. increase all concepts
+        ...     edit_warmup_steps=[10, 10, 10, 10],  # Warmup period for each concept
+        ...     edit_guidance_scale=[4, 5, 5, 5.4],  # Guidance scale for each concept
+        ...     edit_threshold=[
+        ...         0.99,
+        ...         0.975,
+        ...         0.925,
+        ...         0.96,
+        ...     ],  # Threshold for each concept. Threshold equals the percentile of the latent space that will be discarded. I.e. threshold=0.99 uses 1% of the latent dimensions
+        ...     edit_momentum_scale=0.3,  # Momentum scale that will be added to the latent guidance
+        ...     edit_mom_beta=0.6,  # Momentum beta
+        ...     edit_weights=[1, 1, 1, 1, 1],  # Weights of the individual concepts against each other
+        ... )
+        >>> image = out.images[0]
+        ```
+"""
 
 
-class SemanticStableDiffusionPipeline(DiffusionPipeline, StableDiffusionMixin):
+class SemanticStableDiffusionPipeline(DiffusionPipeline):
     r"""
-    Pipeline for text-to-image generation using Stable Diffusion with latent editing.
+    Pipeline for text-to-image generation with latent editing.
 
-    This model inherits from [`DiffusionPipeline`] and builds on the [`StableDiffusionPipeline`]. Check the superclass
-    documentation for the generic methods implemented for all pipelines (downloading, saving, running on a particular
-    device, etc.).
+    This model inherits from [`DiffusionPipeline`]. Check the superclass documentation for the generic methods the
+    library implements for all the pipelines (such as downloading or saving, running on a particular device, etc.)
+
+    This model builds on the implementation of ['StableDiffusionPipeline']
 
     Args:
         vae ([`AutoencoderKL`]):
-            Variational Auto-Encoder (VAE) model to encode and decode images to and from latent representations.
-        text_encoder ([`~transformers.CLIPTextModel`]):
-            Frozen text-encoder ([clip-vit-large-patch14](https://huggingface.co/openai/clip-vit-large-patch14)).
-        tokenizer ([`~transformers.CLIPTokenizer`]):
-            A `CLIPTokenizer` to tokenize text.
-        unet ([`UNet2DConditionModel`]):
-            A `UNet2DConditionModel` to denoise the encoded image latents.
+            Variational Auto-Encoder (VAE) Model to encode and decode images to and from latent representations.
+        text_encoder ([`CLIPTextModel`]):
+            Frozen text-encoder. Stable Diffusion uses the text portion of
+            [CLIP](https://huggingface.co/docs/transformers/model_doc/clip#transformers.CLIPTextModel), specifically
+            the [clip-vit-large-patch14](https://huggingface.co/openai/clip-vit-large-patch14) variant.
+        tokenizer (`CLIPTokenizer`):
+            Tokenizer of class
+            [CLIPTokenizer](https://huggingface.co/docs/transformers/v4.21.0/en/model_doc/clip#transformers.CLIPTokenizer).
+        unet ([`UNet2DConditionModel`]): Conditional U-Net architecture to denoise the encoded image latents.
         scheduler ([`SchedulerMixin`]):
-            A scheduler to be used in combination with `unet` to denoise the encoded image latents. Can be one of
+            A scheduler to be used in combination with `unet` to denoise the encoded image latens. Can be one of
             [`DDIMScheduler`], [`LMSDiscreteScheduler`], or [`PNDMScheduler`].
         safety_checker ([`Q16SafetyChecker`]):
             Classification module that estimates whether generated images could be considered offensive or harmful.
-            Please refer to the [model card](https://huggingface.co/runwayml/stable-diffusion-v1-5) for more details
-            about a model's potential harms.
-        feature_extractor ([`~transformers.CLIPImageProcessor`]):
-            A `CLIPImageProcessor` to extract features from generated images; used as inputs to the `safety_checker`.
+            Please, refer to the [model card](https://huggingface.co/CompVis/stable-diffusion-v1-4) for details.
+        feature_extractor ([`CLIPImageProcessor`]):
+            Model that extracts features from generated images to be used as inputs for the `safety_checker`.
     """
 
-    model_cpu_offload_seq = "text_encoder->unet->vae"
     _optional_components = ["safety_checker", "feature_extractor"]
 
     def __init__(
@@ -88,29 +129,10 @@ class SemanticStableDiffusionPipeline(DiffusionPipeline, StableDiffusionMixin):
             feature_extractor=feature_extractor,
         )
         self.vae_scale_factor = 2 ** (len(self.vae.config.block_out_channels) - 1)
-        self.image_processor = VaeImageProcessor(vae_scale_factor=self.vae_scale_factor)
         self.register_to_config(requires_safety_checker=requires_safety_checker)
-
-    # Copied from diffusers.pipelines.stable_diffusion.pipeline_stable_diffusion.StableDiffusionPipeline.run_safety_checker
-    def run_safety_checker(self, image, device, dtype):
-        if self.safety_checker is None:
-            has_nsfw_concept = None
-        else:
-            if torch.is_tensor(image):
-                feature_extractor_input = self.image_processor.postprocess(image, output_type="pil")
-            else:
-                feature_extractor_input = self.image_processor.numpy_to_pil(image)
-            safety_checker_input = self.feature_extractor(feature_extractor_input, return_tensors="pt").to(device)
-            image, has_nsfw_concept = self.safety_checker(
-                images=image, clip_input=safety_checker_input.pixel_values.to(dtype)
-            )
-        return image, has_nsfw_concept
 
     # Copied from diffusers.pipelines.stable_diffusion.pipeline_stable_diffusion.StableDiffusionPipeline.decode_latents
     def decode_latents(self, latents):
-        deprecation_message = "The decode_latents method is deprecated and will be removed in 1.0.0. Please use VaeImageProcessor.postprocess(...) instead"
-        deprecate("decode_latents", "1.0.0", deprecation_message, standard_warn=False)
-
         latents = 1 / self.vae.config.scaling_factor * latents
         image = self.vae.decode(latents, return_dict=False)[0]
         image = (image / 2 + 0.5).clamp(0, 1)
@@ -136,7 +158,7 @@ class SemanticStableDiffusionPipeline(DiffusionPipeline, StableDiffusionMixin):
             extra_step_kwargs["generator"] = generator
         return extra_step_kwargs
 
-    # Copied from diffusers.pipelines.stable_diffusion_k_diffusion.pipeline_stable_diffusion_k_diffusion.StableDiffusionKDiffusionPipeline.check_inputs
+    # Copied from diffusers.pipelines.stable_diffusion.pipeline_stable_diffusion.StableDiffusionPipeline.check_inputs
     def check_inputs(
         self,
         prompt,
@@ -146,21 +168,16 @@ class SemanticStableDiffusionPipeline(DiffusionPipeline, StableDiffusionMixin):
         negative_prompt=None,
         prompt_embeds=None,
         negative_prompt_embeds=None,
-        callback_on_step_end_tensor_inputs=None,
     ):
         if height % 8 != 0 or width % 8 != 0:
             raise ValueError(f"`height` and `width` have to be divisible by 8 but are {height} and {width}.")
 
-        if callback_steps is not None and (not isinstance(callback_steps, int) or callback_steps <= 0):
+        if (callback_steps is None) or (
+            callback_steps is not None and (not isinstance(callback_steps, int) or callback_steps <= 0)
+        ):
             raise ValueError(
                 f"`callback_steps` has to be a positive integer but is {callback_steps} of type"
                 f" {type(callback_steps)}."
-            )
-        if callback_on_step_end_tensor_inputs is not None and not all(
-            k in self._callback_tensor_inputs for k in callback_on_step_end_tensor_inputs
-        ):
-            raise ValueError(
-                f"`callback_on_step_end_tensor_inputs` has to be in {self._callback_tensor_inputs}, but found {[k for k in callback_on_step_end_tensor_inputs if k not in self._callback_tensor_inputs]}"
             )
 
         if prompt is not None and prompt_embeds is not None:
@@ -191,12 +208,7 @@ class SemanticStableDiffusionPipeline(DiffusionPipeline, StableDiffusionMixin):
 
     # Copied from diffusers.pipelines.stable_diffusion.pipeline_stable_diffusion.StableDiffusionPipeline.prepare_latents
     def prepare_latents(self, batch_size, num_channels_latents, height, width, dtype, device, generator, latents=None):
-        shape = (
-            batch_size,
-            num_channels_latents,
-            int(height) // self.vae_scale_factor,
-            int(width) // self.vae_scale_factor,
-        )
+        shape = (batch_size, num_channels_latents, height // self.vae_scale_factor, width // self.vae_scale_factor)
         if isinstance(generator, list) and len(generator) != batch_size:
             raise ValueError(
                 f"You have passed a list of generators of length {len(generator)}, but requested an effective batch"
@@ -224,10 +236,10 @@ class SemanticStableDiffusionPipeline(DiffusionPipeline, StableDiffusionMixin):
         num_images_per_prompt: int = 1,
         eta: float = 0.0,
         generator: Optional[Union[torch.Generator, List[torch.Generator]]] = None,
-        latents: Optional[torch.Tensor] = None,
+        latents: Optional[torch.FloatTensor] = None,
         output_type: Optional[str] = "pil",
         return_dict: bool = True,
-        callback: Optional[Callable[[int, int, torch.Tensor], None]] = None,
+        callback: Optional[Callable[[int, int, torch.FloatTensor], None]] = None,
         callback_steps: int = 1,
         editing_prompt: Optional[Union[str, List[str]]] = None,
         editing_prompt_embeddings: Optional[torch.Tensor] = None,
@@ -242,130 +254,97 @@ class SemanticStableDiffusionPipeline(DiffusionPipeline, StableDiffusionMixin):
         sem_guidance: Optional[List[torch.Tensor]] = None,
     ):
         r"""
-        The call function to the pipeline for generation.
+        Function invoked when calling the pipeline for generation.
 
         Args:
             prompt (`str` or `List[str]`):
-                The prompt or prompts to guide image generation.
-            height (`int`, *optional*, defaults to `self.unet.config.sample_size * self.vae_scale_factor`):
+                The prompt or prompts to guide the image generation.
+            height (`int`, *optional*, defaults to self.unet.config.sample_size * self.vae_scale_factor):
                 The height in pixels of the generated image.
-            width (`int`, *optional*, defaults to `self.unet.config.sample_size * self.vae_scale_factor`):
+            width (`int`, *optional*, defaults to self.unet.config.sample_size * self.vae_scale_factor):
                 The width in pixels of the generated image.
             num_inference_steps (`int`, *optional*, defaults to 50):
                 The number of denoising steps. More denoising steps usually lead to a higher quality image at the
                 expense of slower inference.
             guidance_scale (`float`, *optional*, defaults to 7.5):
-                A higher guidance scale value encourages the model to generate images closely linked to the text
-                `prompt` at the expense of lower image quality. Guidance scale is enabled when `guidance_scale > 1`.
+                Guidance scale as defined in [Classifier-Free Diffusion Guidance](https://arxiv.org/abs/2207.12598).
+                `guidance_scale` is defined as `w` of equation 2. of [Imagen
+                Paper](https://arxiv.org/pdf/2205.11487.pdf). Guidance scale is enabled by setting `guidance_scale >
+                1`. Higher guidance scale encourages to generate images that are closely linked to the text `prompt`,
+                usually at the expense of lower image quality.
             negative_prompt (`str` or `List[str]`, *optional*):
-                The prompt or prompts to guide what to not include in image generation. If not defined, you need to
-                pass `negative_prompt_embeds` instead. Ignored when not using guidance (`guidance_scale < 1`).
+                The prompt or prompts not to guide the image generation. Ignored when not using guidance (i.e., ignored
+                if `guidance_scale` is less than `1`).
             num_images_per_prompt (`int`, *optional*, defaults to 1):
                 The number of images to generate per prompt.
             eta (`float`, *optional*, defaults to 0.0):
-                Corresponds to parameter eta (η) from the [DDIM](https://arxiv.org/abs/2010.02502) paper. Only applies
-                to the [`~schedulers.DDIMScheduler`], and is ignored in other schedulers.
-            generator (`torch.Generator` or `List[torch.Generator]`, *optional*):
-                A [`torch.Generator`](https://pytorch.org/docs/stable/generated/torch.Generator.html) to make
-                generation deterministic.
-            latents (`torch.Tensor`, *optional*):
-                Pre-generated noisy latents sampled from a Gaussian distribution, to be used as inputs for image
+                Corresponds to parameter eta (η) in the DDIM paper: https://arxiv.org/abs/2010.02502. Only applies to
+                [`schedulers.DDIMScheduler`], will be ignored for others.
+            generator (`torch.Generator`, *optional*):
+                One or a list of [torch generator(s)](https://pytorch.org/docs/stable/generated/torch.Generator.html)
+                to make generation deterministic.
+            latents (`torch.FloatTensor`, *optional*):
+                Pre-generated noisy latents, sampled from a Gaussian distribution, to be used as inputs for image
                 generation. Can be used to tweak the same generation with different prompts. If not provided, a latents
-                tensor is generated by sampling using the supplied random `generator`.
+                tensor will ge generated by sampling using the supplied random `generator`.
             output_type (`str`, *optional*, defaults to `"pil"`):
-                The output format of the generated image. Choose between `PIL.Image` or `np.array`.
+                The output format of the generate image. Choose between
+                [PIL](https://pillow.readthedocs.io/en/stable/): `PIL.Image.Image` or `np.array`.
             return_dict (`bool`, *optional*, defaults to `True`):
                 Whether or not to return a [`~pipelines.stable_diffusion.StableDiffusionPipelineOutput`] instead of a
                 plain tuple.
             callback (`Callable`, *optional*):
-                A function that calls every `callback_steps` steps during inference. The function is called with the
-                following arguments: `callback(step: int, timestep: int, latents: torch.Tensor)`.
+                A function that will be called every `callback_steps` steps during inference. The function will be
+                called with the following arguments: `callback(step: int, timestep: int, latents: torch.FloatTensor)`.
             callback_steps (`int`, *optional*, defaults to 1):
-                The frequency at which the `callback` function is called. If not specified, the callback is called at
-                every step.
+                The frequency at which the `callback` function will be called. If not specified, the callback will be
+                called at every step.
             editing_prompt (`str` or `List[str]`, *optional*):
-                The prompt or prompts to use for semantic guidance. Semantic guidance is disabled by setting
+                The prompt or prompts to use for Semantic guidance. Semantic guidance is disabled by setting
                 `editing_prompt = None`. Guidance direction of prompt should be specified via
                 `reverse_editing_direction`.
-            editing_prompt_embeddings (`torch.Tensor`, *optional*):
+            editing_prompt_embeddings (`torch.Tensor>`, *optional*):
                 Pre-computed embeddings to use for semantic guidance. Guidance direction of embedding should be
                 specified via `reverse_editing_direction`.
             reverse_editing_direction (`bool` or `List[bool]`, *optional*, defaults to `False`):
                 Whether the corresponding prompt in `editing_prompt` should be increased or decreased.
             edit_guidance_scale (`float` or `List[float]`, *optional*, defaults to 5):
-                Guidance scale for semantic guidance. If provided as a list, values should correspond to
-                `editing_prompt`.
+                Guidance scale for semantic guidance. If provided as list values should correspond to `editing_prompt`.
+                `edit_guidance_scale` is defined as `s_e` of equation 6 of [SEGA
+                Paper](https://arxiv.org/pdf/2301.12247.pdf).
             edit_warmup_steps (`float` or `List[float]`, *optional*, defaults to 10):
-                Number of diffusion steps (for each prompt) for which semantic guidance is not applied. Momentum is
-                calculated for those steps and applied once all warmup periods are over.
+                Number of diffusion steps (for each prompt) for which semantic guidance will not be applied. Momentum
+                will still be calculated for those steps and applied once all warmup periods are over.
+                `edit_warmup_steps` is defined as `delta` (δ) of [SEGA Paper](https://arxiv.org/pdf/2301.12247.pdf).
             edit_cooldown_steps (`float` or `List[float]`, *optional*, defaults to `None`):
-                Number of diffusion steps (for each prompt) after which semantic guidance is longer applied.
+                Number of diffusion steps (for each prompt) after which semantic guidance will no longer be applied.
             edit_threshold (`float` or `List[float]`, *optional*, defaults to 0.9):
                 Threshold of semantic guidance.
             edit_momentum_scale (`float`, *optional*, defaults to 0.1):
-                Scale of the momentum to be added to the semantic guidance at each diffusion step. If set to 0.0,
-                momentum is disabled. Momentum is already built up during warmup (for diffusion steps smaller than
-                `sld_warmup_steps`). Momentum is only added to latent guidance once all warmup periods are finished.
+                Scale of the momentum to be added to the semantic guidance at each diffusion step. If set to 0.0
+                momentum will be disabled. Momentum is already built up during warmup, i.e. for diffusion steps smaller
+                than `sld_warmup_steps`. Momentum will only be added to latent guidance once all warmup periods are
+                finished. `edit_momentum_scale` is defined as `s_m` of equation 7 of [SEGA
+                Paper](https://arxiv.org/pdf/2301.12247.pdf).
             edit_mom_beta (`float`, *optional*, defaults to 0.4):
                 Defines how semantic guidance momentum builds up. `edit_mom_beta` indicates how much of the previous
-                momentum is kept. Momentum is already built up during warmup (for diffusion steps smaller than
-                `edit_warmup_steps`).
+                momentum will be kept. Momentum is already built up during warmup, i.e. for diffusion steps smaller
+                than `edit_warmup_steps`. `edit_mom_beta` is defined as `beta_m` (β) of equation 8 of [SEGA
+                Paper](https://arxiv.org/pdf/2301.12247.pdf).
             edit_weights (`List[float]`, *optional*, defaults to `None`):
                 Indicates how much each individual concept should influence the overall guidance. If no weights are
-                provided all concepts are applied equally.
+                provided all concepts are applied equally. `edit_mom_beta` is defined as `g_i` of equation 9 of [SEGA
+                Paper](https://arxiv.org/pdf/2301.12247.pdf).
             sem_guidance (`List[torch.Tensor]`, *optional*):
                 List of pre-generated guidance vectors to be applied at generation. Length of the list has to
                 correspond to `num_inference_steps`.
 
-        Examples:
-
-        ```py
-        >>> import torch
-        >>> from diffusers import SemanticStableDiffusionPipeline
-
-        >>> pipe = SemanticStableDiffusionPipeline.from_pretrained(
-        ...     "runwayml/stable-diffusion-v1-5", torch_dtype=torch.float16
-        ... )
-        >>> pipe = pipe.to("cuda")
-
-        >>> out = pipe(
-        ...     prompt="a photo of the face of a woman",
-        ...     num_images_per_prompt=1,
-        ...     guidance_scale=7,
-        ...     editing_prompt=[
-        ...         "smiling, smile",  # Concepts to apply
-        ...         "glasses, wearing glasses",
-        ...         "curls, wavy hair, curly hair",
-        ...         "beard, full beard, mustache",
-        ...     ],
-        ...     reverse_editing_direction=[
-        ...         False,
-        ...         False,
-        ...         False,
-        ...         False,
-        ...     ],  # Direction of guidance i.e. increase all concepts
-        ...     edit_warmup_steps=[10, 10, 10, 10],  # Warmup period for each concept
-        ...     edit_guidance_scale=[4, 5, 5, 5.4],  # Guidance scale for each concept
-        ...     edit_threshold=[
-        ...         0.99,
-        ...         0.975,
-        ...         0.925,
-        ...         0.96,
-        ...     ],  # Threshold for each concept. Threshold equals the percentile of the latent space that will be discarded. I.e. threshold=0.99 uses 1% of the latent dimensions
-        ...     edit_momentum_scale=0.3,  # Momentum scale that will be added to the latent guidance
-        ...     edit_mom_beta=0.6,  # Momentum beta
-        ...     edit_weights=[1, 1, 1, 1, 1],  # Weights of the individual concepts against each other
-        ... )
-        >>> image = out.images[0]
-        ```
-
         Returns:
             [`~pipelines.semantic_stable_diffusion.SemanticStableDiffusionPipelineOutput`] or `tuple`:
-                If `return_dict` is `True`,
-                [`~pipelines.semantic_stable_diffusion.SemanticStableDiffusionPipelineOutput`] is returned, otherwise a
-                `tuple` is returned where the first element is a list with the generated images and the second element
-                is a list of `bool`s indicating whether the corresponding generated image contains "not-safe-for-work"
-                (nsfw) content.
+            [`~pipelines.semantic_stable_diffusion.SemanticStableDiffusionPipelineOutput`] if `return_dict` is True,
+            otherwise a `tuple. When returning a tuple, the first element is a list with the generated images, and the
+            second element is a list of `bool`s denoting whether the corresponding generated image likely represents
+            "not-safe-for-work" (nsfw) content, according to the `safety_checker`.
         """
         # 0. Default height and width to unet
         height = height or self.unet.config.sample_size * self.vae_scale_factor
@@ -376,7 +355,6 @@ class SemanticStableDiffusionPipeline(DiffusionPipeline, StableDiffusionMixin):
 
         # 2. Define call parameters
         batch_size = 1 if isinstance(prompt, str) else len(prompt)
-        device = self._execution_device
 
         if editing_prompt:
             enable_edit_guidance = True
@@ -406,7 +384,7 @@ class SemanticStableDiffusionPipeline(DiffusionPipeline, StableDiffusionMixin):
                 f" {self.tokenizer.model_max_length} tokens: {removed_text}"
             )
             text_input_ids = text_input_ids[:, : self.tokenizer.model_max_length]
-        text_embeddings = self.text_encoder(text_input_ids.to(device))[0]
+        text_embeddings = self.text_encoder(text_input_ids.to(self.device))[0]
 
         # duplicate text embeddings for each generation per prompt, using mps friendly method
         bs_embed, seq_len, _ = text_embeddings.shape
@@ -434,9 +412,9 @@ class SemanticStableDiffusionPipeline(DiffusionPipeline, StableDiffusionMixin):
                         f" {self.tokenizer.model_max_length} tokens: {removed_text}"
                     )
                     edit_concepts_input_ids = edit_concepts_input_ids[:, : self.tokenizer.model_max_length]
-                edit_concepts = self.text_encoder(edit_concepts_input_ids.to(device))[0]
+                edit_concepts = self.text_encoder(edit_concepts_input_ids.to(self.device))[0]
             else:
-                edit_concepts = editing_prompt_embeddings.to(device).repeat(batch_size, 1, 1)
+                edit_concepts = editing_prompt_embeddings.to(self.device).repeat(batch_size, 1, 1)
 
             # duplicate text embeddings for each generation per prompt, using mps friendly method
             bs_embed_edit, seq_len_edit, _ = edit_concepts.shape
@@ -452,7 +430,7 @@ class SemanticStableDiffusionPipeline(DiffusionPipeline, StableDiffusionMixin):
         if do_classifier_free_guidance:
             uncond_tokens: List[str]
             if negative_prompt is None:
-                uncond_tokens = [""] * batch_size
+                uncond_tokens = [""]
             elif type(prompt) is not type(negative_prompt):
                 raise TypeError(
                     f"`negative_prompt` should be the same type to `prompt`, but got {type(negative_prompt)} !="
@@ -477,11 +455,11 @@ class SemanticStableDiffusionPipeline(DiffusionPipeline, StableDiffusionMixin):
                 truncation=True,
                 return_tensors="pt",
             )
-            uncond_embeddings = self.text_encoder(uncond_input.input_ids.to(device))[0]
+            uncond_embeddings = self.text_encoder(uncond_input.input_ids.to(self.device))[0]
 
             # duplicate unconditional embeddings for each generation per prompt, using mps friendly method
             seq_len = uncond_embeddings.shape[1]
-            uncond_embeddings = uncond_embeddings.repeat(1, num_images_per_prompt, 1)
+            uncond_embeddings = uncond_embeddings.repeat(batch_size, num_images_per_prompt, 1)
             uncond_embeddings = uncond_embeddings.view(batch_size * num_images_per_prompt, seq_len, -1)
 
             # For classifier free guidance, we need to do two forward passes.
@@ -494,7 +472,7 @@ class SemanticStableDiffusionPipeline(DiffusionPipeline, StableDiffusionMixin):
         # get the initial random noise unless the user supplied it
 
         # 4. Prepare timesteps
-        self.scheduler.set_timesteps(num_inference_steps, device=device)
+        self.scheduler.set_timesteps(num_inference_steps, device=self.device)
         timesteps = self.scheduler.timesteps
 
         # 5. Prepare latent variables
@@ -505,7 +483,7 @@ class SemanticStableDiffusionPipeline(DiffusionPipeline, StableDiffusionMixin):
             height,
             width,
             text_embeddings.dtype,
-            device,
+            self.device,
             generator,
             latents,
         )
@@ -563,12 +541,12 @@ class SemanticStableDiffusionPipeline(DiffusionPipeline, StableDiffusionMixin):
                 if enable_edit_guidance:
                     concept_weights = torch.zeros(
                         (len(noise_pred_edit_concepts), noise_guidance.shape[0]),
-                        device=device,
+                        device=self.device,
                         dtype=noise_guidance.dtype,
                     )
                     noise_guidance_edit = torch.zeros(
                         (len(noise_pred_edit_concepts), *noise_guidance.shape),
-                        device=device,
+                        device=self.device,
                         dtype=noise_guidance.dtype,
                     )
                     # noise_guidance_edit = torch.zeros_like(noise_guidance)
@@ -645,30 +623,33 @@ class SemanticStableDiffusionPipeline(DiffusionPipeline, StableDiffusionMixin):
 
                         # noise_guidance_edit = noise_guidance_edit + noise_guidance_edit_tmp
 
-                    warmup_inds = torch.tensor(warmup_inds).to(device)
+                    warmup_inds = torch.tensor(warmup_inds).to(self.device)
                     if len(noise_pred_edit_concepts) > warmup_inds.shape[0] > 0:
                         concept_weights = concept_weights.to("cpu")  # Offload to cpu
                         noise_guidance_edit = noise_guidance_edit.to("cpu")
 
-                        concept_weights_tmp = torch.index_select(concept_weights.to(device), 0, warmup_inds)
+                        concept_weights_tmp = torch.index_select(concept_weights.to(self.device), 0, warmup_inds)
                         concept_weights_tmp = torch.where(
                             concept_weights_tmp < 0, torch.zeros_like(concept_weights_tmp), concept_weights_tmp
                         )
                         concept_weights_tmp = concept_weights_tmp / concept_weights_tmp.sum(dim=0)
                         # concept_weights_tmp = torch.nan_to_num(concept_weights_tmp)
 
-                        noise_guidance_edit_tmp = torch.index_select(noise_guidance_edit.to(device), 0, warmup_inds)
+                        noise_guidance_edit_tmp = torch.index_select(
+                            noise_guidance_edit.to(self.device), 0, warmup_inds
+                        )
                         noise_guidance_edit_tmp = torch.einsum(
                             "cb,cbijk->bijk", concept_weights_tmp, noise_guidance_edit_tmp
                         )
+                        noise_guidance_edit_tmp = noise_guidance_edit_tmp
                         noise_guidance = noise_guidance + noise_guidance_edit_tmp
 
                         self.sem_guidance[i] = noise_guidance_edit_tmp.detach().cpu()
 
                         del noise_guidance_edit_tmp
                         del concept_weights_tmp
-                        concept_weights = concept_weights.to(device)
-                        noise_guidance_edit = noise_guidance_edit.to(device)
+                        concept_weights = concept_weights.to(self.device)
+                        noise_guidance_edit = noise_guidance_edit.to(self.device)
 
                     concept_weights = torch.where(
                         concept_weights < 0, torch.zeros_like(concept_weights), concept_weights
@@ -677,7 +658,6 @@ class SemanticStableDiffusionPipeline(DiffusionPipeline, StableDiffusionMixin):
                     concept_weights = torch.nan_to_num(concept_weights)
 
                     noise_guidance_edit = torch.einsum("cb,cbijk->bijk", concept_weights, noise_guidance_edit)
-                    noise_guidance_edit = noise_guidance_edit.to(edit_momentum.device)
 
                     noise_guidance_edit = noise_guidance_edit + edit_momentum_scale * edit_momentum
 
@@ -688,7 +668,7 @@ class SemanticStableDiffusionPipeline(DiffusionPipeline, StableDiffusionMixin):
                         self.sem_guidance[i] = noise_guidance_edit.detach().cpu()
 
                 if sem_guidance is not None:
-                    edit_guidance = sem_guidance[i].to(device)
+                    edit_guidance = sem_guidance[i].to(self.device)
                     noise_guidance = noise_guidance + edit_guidance
 
                 noise_pred = noise_pred_uncond + noise_guidance
@@ -698,23 +678,23 @@ class SemanticStableDiffusionPipeline(DiffusionPipeline, StableDiffusionMixin):
 
             # call the callback, if provided
             if callback is not None and i % callback_steps == 0:
-                step_idx = i // getattr(self.scheduler, "order", 1)
-                callback(step_idx, t, latents)
+                callback(i, t, latents)
 
         # 8. Post-processing
-        if not output_type == "latent":
-            image = self.vae.decode(latents / self.vae.config.scaling_factor, return_dict=False)[0]
-            image, has_nsfw_concept = self.run_safety_checker(image, device, text_embeddings.dtype)
+        image = self.decode_latents(latents)
+
+        if self.safety_checker is not None:
+            safety_checker_input = self.feature_extractor(self.numpy_to_pil(image), return_tensors="pt").to(
+                self.device
+            )
+            image, has_nsfw_concept = self.safety_checker(
+                images=image, clip_input=safety_checker_input.pixel_values.to(text_embeddings.dtype)
+            )
         else:
-            image = latents
             has_nsfw_concept = None
 
-        if has_nsfw_concept is None:
-            do_denormalize = [True] * image.shape[0]
-        else:
-            do_denormalize = [not has_nsfw for has_nsfw in has_nsfw_concept]
-
-        image = self.image_processor.postprocess(image, output_type=output_type, do_denormalize=do_denormalize)
+        if output_type == "pil":
+            image = self.numpy_to_pil(image)
 
         if not return_dict:
             return (image, has_nsfw_concept)
