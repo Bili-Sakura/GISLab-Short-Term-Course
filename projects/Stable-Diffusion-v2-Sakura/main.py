@@ -1,5 +1,5 @@
 import torch
-from diffusers import StableDiffusionPipeline, DPMSolverMultistepScheduler
+from lib.diffusers import StableDiffusionPipeline, DPMSolverMultistepScheduler
 
 # model_id = "stabilityai/stable-diffusion-2-1"
 model_id = "./checkpoints/"
@@ -11,5 +11,5 @@ pipe = pipe.to("cuda")
 
 prompt = "a photo of an astronaut riding a horse on mars"
 image = pipe(prompt).images[0]
-    
+
 image.save("astronaut_rides_horse.png")
