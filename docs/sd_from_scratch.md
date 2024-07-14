@@ -207,4 +207,6 @@ pip install -r requirements.txt
    tar -xzf sd-all.tar.gz -C /home/gis2024/.conda/envs/sd-all #unpack env
    ```
    
-   
+### Generate your first image with diffusers' pipeline
+
+   1
