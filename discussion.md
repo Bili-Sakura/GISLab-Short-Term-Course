@@ -526,15 +526,11 @@ caption = "a fmow satellite image of a amusement park in Australia"
 metadata = [ 925.8798,  345.2111, 411.4541,    0.0000,  308.3333,  166.6667, 354.8387]
 ```
 
-<<<<<<< HEAD
-![图片alt](assets/SD-Australia.jpg)
-![图片alt](assets/output_Australia.png)
-=======
 <div style="display: flex;">
     <img src="assets/SD-Australia.jpg" alt="Image1" style="width: 512px; height: 512px;">
     <img src="assets/output_Australia.png" alt="Output1" style="width: 512px; height: 512px;">
 </div>
->>>>>>> be985e4c6357c9c04fd1d3c4fe6a7fee1a91e77b
+
 
 ### Demo2
 
@@ -543,15 +539,10 @@ caption = "a fmow satellite image of a electric substation in India"
 metadata = metadata_normalize([76.5712666476, 28.6965307997, 0.929417550564, 0.0765712666476, 2015, 2, 27]).tolist()
 ```
 
-<<<<<<< HEAD
-![图片alt](assets/SD-India.jpg)
-![图片alt](assets/output_india.jpg)
-=======
 <div style="display: flex;">
     <img src="assets/SD-India.jpg" alt="Image2" style="width: 512px; height: 512px;">
     <img src="assets/output_india.jpg" alt="Output2" style="width: 512px; height: 512px;">
 </div>
->>>>>>> be985e4c6357c9c04fd1d3c4fe6a7fee1a91e77b
 
 ### Demo3
 
@@ -560,15 +551,10 @@ caption = "A satellite image of a dam in the Three Gorges region, China"
 metadata = metadata_normalize([111.0280, 30.8210, 0.975, 0.075, 2023, 8, 15]).tolist()
 ```
 
-<<<<<<< HEAD
-![图片alt](assets/SD-dam.jpg)
-![图片alt](assets/output_dam.jpg)
-=======
 <div style="display: flex;">
     <img src="assets/SD-dam.jpg" alt="Image3" style="width: 512px; height: 512px;">
     <img src="assets/output_dam.jpg" alt="Output3" style="width: 512px; height: 512px;">
 </div>
->>>>>>> be985e4c6357c9c04fd1d3c4fe6a7fee1a91e77b
 
 ### Demo4
 
@@ -577,12 +563,207 @@ caption = "An urban satellite image highlighting green spaces in Central Park, N
 metadata = metadata_normalize([-73.968285, 40.785091, 0.920, 0.080, 2022, 5, 10]).tolist()
 ```
 
-<<<<<<< HEAD
-![图片alt](assets/SD-NY.jpg)
-![图片alt](assets/output_NY.jpg)
-=======
 <div style="display: flex;">
     <img src="assets/SD-NY.jpg" alt="Image4" style="width: 512px; height: 512px;">
     <img src="assets/output_NY.jpg" alt="Output4" style="width: 512px; height: 512px;">
 </div>
->>>>>>> be985e4c6357c9c04fd1d3c4fe6a7fee1a91e77b
+
+## 7/13 prompt变量对比测试
+
+### 受灾程度
+
+```
+(1) Prompt: A satellite image of farmland suffering from severe flooding in India
+    Output: output_India_1
+(2) Prompt: A satellite image of farmland suffering from normal flooding in India
+    Output: output_India_2
+(3) Prompt: A satellite image of farmland suffering from slight flooding in India
+    Output: output_India_3
+```
+
+> sequence: DiffusionSat/SDv3/SDv3-reference img
+
+<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center;">
+  <!-- 第一列 -->
+  <div>
+    <img src="assets/discussion-img/output_India_1.jpg" alt="Image 1" style="width: 100%; height: auto;">
+    <img src="assets/discussion-img/output_India_1_SD.png" alt="Image 2" style="width: 100%; height: auto;">
+    <img src="assets/discussion-img/output_India_1_SD_reference.png" alt="Image 3" style="width: 100%; height: auto;">
+    <p>severe</p>
+  </div>
+  <!-- 第二列 -->
+  <div>
+    <img src="assets/discussion-img/output_India_2.jpg" alt="Image 4" style="width: 100%; height: auto;">
+    <img src="assets/discussion-img/output_India_2_SD.png" alt="Image 5" style="width: 100%; height: auto;">
+    <img src="assets/discussion-img/output_India_2_SD_reference.png" alt="Image 6" style="width: 100%; height: auto;">
+    <p>normal</p>
+  </div>
+  <!-- 第三列 -->
+  <div>
+    <img src="assets/discussion-img/output_India_3.jpg" alt="Image 7" style="width: 100%; height: auto;">
+    <img src="assets/discussion-img/output_India_3_SD.png" alt="Image 8" style="width: 100%; height: auto;">
+    <img src="assets/discussion-img/output_India_3_SD_reference.png" alt="Image 9" style="width: 100%; height: auto;">
+    <p>slight</p>
+  </div>
+</div>
+
+总结：DiffusionSat能在一定程度上理解severe等代表灾害程度的形容词，但SD没有这种能力。
+
+### 受灾方位
+
+```
+(1) Prompt: A satellite image of Indian farmland suffering from floods, with the affected area located in the northern part of the image
+    Output: output_India_4
+(2) Prompt: A satellite image of Indian farmland suffering from floods, with the affected area located in the southern part of the image
+    Output: output_India_5
+(3) Prompt: A satellite image of Indian farmland suffering from floods, with the affected area located in the eastern part of the image
+    Output: output_India_6
+(4) Prompt: A satellite image of Indian farmland suffering from floods, with the affected area located in the western part of the image
+    Output: output_India_7
+```
+> sequence: DiffusionSat/SDv3-reference img
+
+<div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; text-align: center;">
+  <!-- 第一列 -->
+  <div>
+    <img src="assets/discussion-img/output_India_4.jpg" alt="Image 1" style="width: 100%; height: auto;">
+    <img src="assets/discussion-img/output_India_4_SD_reference.png" alt="Image 2" style="width: 100%; height: auto;">
+    <p>northern</p>
+  </div>
+  <!-- 第二列 -->
+  <div>
+    <img src="assets/discussion-img/output_India_5.jpg" alt="Image 3" style="width: 100%; height: auto;">
+    <img src="assets/discussion-img/output_India_5_SD_reference.png" alt="Image 4" style="width: 100%; height: auto;">
+    <p>southern</p>
+  </div>
+  <!-- 第三列 -->
+  <div>
+    <img src="assets/discussion-img/output_India_6.jpg" alt="Image 5" style="width: 100%; height: auto;">
+    <img src="assets/discussion-img/output_India_6_SD_reference.png" alt="Image 6" style="width: 100%; height: auto;">
+    <p>eastern</p>
+  </div>
+    <!-- 第四列 -->
+  <div>
+    <img src="assets/discussion-img/output_India_7.jpg" alt="Image 7" style="width: 100%; height: auto;">
+    <img src="assets/discussion-img/output_India_7_SD_reference.png" alt="Image 8" style="width: 100%; height: auto;">
+    <p>western</p>
+  </div>
+</div>
+
+```
+or, describe in another way(upper/lower/left/right side)
+Output：output_India_8 to 11
+```
+
+<div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; text-align: center;">
+  <!-- 第一列 -->
+  <div>
+    <img src="assets/discussion-img/output_India_8.jpg" alt="Image 1" style="width: 100%; height: auto;">
+    <p>upper</p>
+  </div>
+  <!-- 第二列 -->
+  <div>
+    <img src="assets/discussion-img/output_India_9.jpg" alt="Image 2" style="width: 100%; height: auto;">
+    <p>lower</p>
+  </div>
+  <!-- 第三列 -->
+  <div>
+    <img src="assets/discussion-img/output_India_10.jpg" alt="Image 3" style="width: 100%; height: auto;">
+    <p>left</p>
+  </div>
+    <!-- 第四列 -->
+  <div>
+    <img src="assets/discussion-img/output_India_11.jpg" alt="Image 4" style="width: 100%; height: auto;">
+    <p>right</p>
+  </div>
+</div>
+
+总结：无论是DiffusionSat或是SD，模型都没有能理解空间关系的能力。
+
+### 地物细节
+
+```
+(1) Prompt: A satellite image of Indian farmland suffering from floods, with a building in the image
+    Output: output_India_12
+(2) Prompt: A satellite image of Indian farmland suffering from floods, with many buildings center on one area of the image
+    Output: output_India_13
+(3) Prompt: A satellite image of Indian farmland suffering from floods, with many buildings scattering in different areas of the image
+    Output: output_India_14
+(4) Prompt: A satellite image of Indian farmland suffering from floods, with only two buildings in the image
+    Output: output_India_19
+```
+
+> sequence: DiffusionSat/SDv3-reference img
+
+<div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; text-align: center;">
+  <!-- 第一列 -->
+  <div>
+    <img src="assets/discussion-img/output_India_12.jpg" alt="Image 1" style="width: 100%; height: auto;">
+    <img src="assets/discussion-img/output_India_12_SD_reference.png" alt="Image 2" style="width: 100%; height: auto;">
+    <p>one building</p>
+  </div>
+  <!-- 第二列 -->
+  <div>
+    <img src="assets/discussion-img/output_India_13.jpg" alt="Image 3" style="width: 100%; height: auto;">
+    <img src="assets/discussion-img/output_India_13_SD_reference.png" alt="Image 4" style="width: 100%; height: auto;">
+    <p>center</p>
+  </div>
+  <!-- 第三列 -->
+  <div>
+    <img src="assets/discussion-img/output_India_14.jpg" alt="Image 5" style="width: 100%; height: auto;">
+    <img src="assets/discussion-img/output_India_14_SD_reference.png" alt="Image 6" style="width: 100%; height: auto;">
+    <p>scatter</p>
+  </div>
+  <!-- 第四列 -->
+  <div>
+    <img src="assets/discussion-img/output_India_19.jpg" alt="Image 7" style="width: 100%; height: auto;">
+    <img src="assets/discussion-img/output_India_19_SD_reference.png" alt="Image 8" style="width: 100%; height: auto;">
+    <p>two buildings</p>
+  </div>
+</div>
+
+### 影像质量
+
+```
+(1) Prompt: A satellite image of Indian farmland suffering from floods, with no cloud covering the image
+    Output: output_India_15
+(2) Prompt: A satellite image of Indian farmland suffering from floods, with thick cloud covering the image
+    Output: output_India_16
+(3) Prompt: A satellite image of Indian farmland suffering from floods, on a large scale
+    Output: output_India_17
+(4) Prompt: A satellite image of Indian farmland suffering from floods, on a small scale
+    Output: output_India_18
+```
+
+> sequence: DiffusionSat/SDv3-reference img
+
+<div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; text-align: center;">
+  <!-- 第一列 -->
+  <div>
+    <img src="assets/discussion-img/output_India_15.jpg" alt="Image 1" style="width: 100%; height: auto;">
+    <img src="assets/discussion-img/output_India_15_SD_reference.png" alt="Image 2" style="width: 100%; height: auto;">
+    <p>no cloud</p>
+  </div>
+  <!-- 第二列 -->
+  <div>
+    <img src="assets/discussion-img/output_India_16.jpg" alt="Image 3" style="width: 100%; height: auto;">
+    <img src="assets/discussion-img/output_India_16_SD_reference.png" alt="Image 4" style="width: 100%; height: auto;">
+    <p>thick cloud</p>
+  </div>
+  <!-- 第三列 -->
+  <div>
+    <img src="assets/discussion-img/output_India_17.jpg" alt="Image 5" style="width: 100%; height: auto;">
+    <img src="assets/discussion-img/output_India_17_SD_reference.png" alt="Image 6" style="width: 100%; height: auto;">
+    <p>large scale</p>
+  </div>
+    <!-- 第四列 -->
+  <div>
+    <img src="assets/discussion-img/output_India_18.jpg" alt="Image 7" style="width: 100%; height: auto;">
+    <img src="assets/discussion-img/output_India_18_SD_reference.png" alt="Image 8" style="width: 100%; height: auto;">
+    <p>small scale</p>
+  </div>
+</div>
+## 7.4Training@sakura
+
+Example: Training ControlNet with Diffusers: [Web Link](https://github.com/huggingface/diffusers/tree/main/examples/controlnet) / [Local Doc](./docs/train_with_diffusers/md)
+

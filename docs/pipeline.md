@@ -107,3 +107,74 @@ DiffusionSAT is able to check image safety.
 
 2000 prompts = 50 cities&metadata × 4 disasters  × 10 captions
 
+## Training ControlNet for DiffusionSat
+
+> ref: [Tutorial](https://huggingface.co/blog/train-your-controlnet)
+
+- Task: Training a controlnet component into DiffusionSat (e.g. `finetune_sd21_sn-satlas-fmow_snr5_md7norm_bs64.checkpoint`)
+
+- Goal: The result model is able to generate pre-event/post-event satellite image with refered image as well as prompt (e.g. flooding,hurricane,wildfire) This is regarded as an inpainting image-to-image task. (see [Huggingface Inpainting](https://huggingface.co/docs/diffusers/v0.29.2/en/using-diffusers/sdxl#image-to-image))
+
+- Dataset Source: xBD (~10000 image pairs,512×512), SpaceNet8 (~1300 image pairs, ranging size over 512×512)
+
+- Curated Training Dataset Format Sample (see [Huggingface Image Dataset](https://huggingface.co/docs/datasets/image_dataset#imagefolder))
+
+  - Dataset Structure
+
+      ```bash
+      controlnet_dataset/
+      │
+      ├── train/                      # Training dataset
+      │   ├── images/                 # Target images (ground_truth)
+      │   │   ├── image1_pre.png
+      │   │   ├── image2_post.png
+      │   │   └── ...
+      │   ├── captions.json           # Text prompts as well as metadata for each image
+      	├── mask/                   # （opt）Mask images (e.g. region that affected by disaster)
+      │   │   ├── image1_mask.png
+      │   │   ├── image2_mask.png
+      │   │   └── ...
+      │   └── conditioning_images/    # pre-event/post-event image paired with target image
+      │       ├── image1_post.png
+      │       ├── image2_pre.png
+      │       └── ...
+      │
+      ├── val/                        # Validation dataset (structured similarly to train/)
+      │   └── ...
+      │
+      └── test/                       # Test dataset (structured similarly to train/)
+          └── ...
+      
+      ```
+  
+  - `captions.json`
+  
+      ```json
+      {
+          [
+          "prompt":...,
+          "metadata":...,
+          "ground_truth_image":...,
+          "conditioning_image":...
+          ],
+      }
+      ```
+  
+      
+
+### Supplementary Details from DiffusionSat
+
+![](./assets/teaser.png)
+
+![diffusion_sat_controlnet](./assets/diffusion_sat_controlnet.png)
+
+![diffusion_sat_inpainting](./assets/diffusion_sat_inpainting.png)
+
+| Dataset       | Caption                                                      |
+| ------------- | ------------------------------------------------------------ |
+| fMoW          | "a [fmow] satellite image [of a <object>] [in <country>]"    |
+| SpaceNet      | "a [spacenet] satellite image [of <object>] [in <city>]"     |
+| Satlas        | "a [satlas] satellite image [of <object>]"                   |
+| Texas Housing | "a [satlas] satellite image [of houses] [built in <year_built>] [covering <num_acres> acres]" |
+| xBD           | "a [fmow] satellite image [<before/after>] being affected by a <disaster_type> natural disaster" |
+

@@ -1,6 +1,6 @@
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import StrOutputParser
+from langchain_core.output_parsers.json import JsonOutputParser
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain.globals import set_verbose, get_verbose
 from langchain_glm import ChatZhipuAI
@@ -24,24 +24,23 @@ def generate_items():
         model="deepseek-chat",
         api_key=deepseek_api_key,
         openai_api_base="https://api.deepseek.com",
-        max_tokens=1024,
+        # max_tokens=1024,
     )
     # Create a prompt template
-    system_template = "Generate 10 cities in list:"
+    system_template = "Generate 10 cities in JSON format with fields name and country:"
     prompt_template = ChatPromptTemplate.from_messages(
         [("system", system_template), ("user", "")]
     )
 
     # Initialize the parser
-    parser = StrOutputParser()
+    parser = JsonOutputParser()
 
     # Chain the components together
     chain = prompt_template | model | parser
     response = chain.invoke({"text": ""})
 
     # Process the response
-    items = response.split("\n")  # Assuming each item is on a new line
-    items_json = json.dumps(items, indent=4)
+    items_json = json.dumps(response, indent=4)
 
     # Save the generated items to a JSON file
     with open("data/items.json", "w") as f:
