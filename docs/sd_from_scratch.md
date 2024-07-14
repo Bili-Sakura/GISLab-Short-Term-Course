@@ -88,19 +88,19 @@ C. Manually download by multi-click (the way the author use)
 As there would not be too many files for downloading, manually downloading files is okay.
 
 > [!CAUTION]
-> You should manually correct the file name when downloading file from a subfolder in root directory. For instance, a file named `scheduler_config.json` under `scheduler` folder would turn to `scheduler_scheduler_config.json` (being added folder name with '_'). 
+> You should manually correct the file name when downloading file from a subfolder in root directory. For instance, a file named `scheduler_config.json` under `scheduler` folder would turn to `scheduler_scheduler_config.json` (being added folder name with '_').
 >
 > ```bash
 > root/ #huggingface hub 
 > ├── scheduler/
-> 	└──scheduler_config.json
+>  └──scheduler_config.json
 > ```
 >
 > ```bash
 > SD-Difusers-all-in-one/ #your project 
 > ├── models/
 > |   └──scheduler/
-> |		└──scheduler_scheduler_config.json # should be correct into scheduler_config.json
+> |  └──scheduler_scheduler_config.json # should be correct into scheduler_config.json
 > ├── data/
 > ├── src/
 > ├── main.py
@@ -117,25 +117,94 @@ For quick start, only a few packages is required (but can be large). If you want
 ````python
 # requirements.txt
 
-## common conda packages
+## common packages
 
 ## Required Package:
 diffusers
 transformers
 pytorch
 accelerate
-xformer
+xformers
+# should be more ...
 
 ## Optional Packages:
 streamlit # GUI
 gradio # GUI
-matplotlib # ....
+matplotlib 
+tqdm
+# ....
 ````
+
+Using Python Virtual Env:
+
+```bash
+cd SD-Difusers-all-in-one # go to the root directory
+python -m venv .venv # virual env named .venv which could be instantly ignored by .gitignore
+.\.venv\Scripts\activate # windows
+# 'source .venv/bin/activate' on macOS and Linux
+pip install -r requirements.txt
+```
+
+Using Conda Env
+
+```
+cd SD-Difusers-all-in-one # go to the root directory
+conda create --name sd-all python=3.10
+conda activate sd-all
+conda install cudatollkit pytorch torchvision
+pip install -r requirements.txt
+```
 
 > [!CAUTION]
 >
-> The `diffusers` package is updating fast. Therefore, we always manually download source code from https://github.com/huggingface/diffusers, and place it under `/src` or `/lib` in root directory. Given this, we would import the `diffusers` package as follow:
+> The `diffusers` package is updating fast. Therefore, we always manually download source code from <https://github.com/huggingface/diffusers>, and place it under `/src` or `/lib` in root directory. Given this, we would import the `diffusers` package as follow:
 >
 > ```bash
 > from lib.diffusers import StableDiffusionPipeline, DPMSolverMultistepScheduler
 > # instead of 'from diffusers import ...' which import the module from conda env
+> ```
+
+#### Setup conda env from Windows to Linux
+
+1. Install Ubuntu on Windows 
+
+	The following commands are executed in Ubuntu.
+
+1. Create conda env named `sd-all`
+
+    ```bash
+    conda create -n sd-all python=3.10 pip cudatollkit pytorch torchvision numpy -c pytorch -c defaults
+    ```
+
+2. Install more packages
+
+    ```bash
+    pip install transformers troch accelerate xformers
+    ```
+
+3. Install conda-pack to wrap up conda env from Windows to Linux
+
+    ```bash
+    conda install -c conda-forge conda-pack
+    ```
+
+4. After successfully installing all the necessary packages, pack it up
+
+    ```bash
+    conda pack -n sd-all -o sd-all.tar.gz
+    ```
+
+6. Move env package from Ubuntu to PC
+
+    ```bash
+    mv sd-all.tar.gz /mnt/d # move to Drive D:
+    ```
+
+7. Upload env onto Linux server and unpack it
+
+   ```bash
+   mkdir -p /home/gis2024/.conda/envs/sd-all # create a empty folder named sd-all in conda envs directory
+   tar -xzf sd-all.tar.gz -C /home/gis2024/.conda/envs/sd-all #unpack env
+   ```
+   
+   
