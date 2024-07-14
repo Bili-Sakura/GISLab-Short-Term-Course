@@ -111,3 +111,10 @@ To-do List:
 - [ ] Try [CogVLM2](https://huggingface.co/THUDM/cogvlm2-llama3-chat-19B) for image captioning
 - [ ] Read documentation of [diffusers](https://hf-mirror.com/docs/diffusers/v0.29.2/en/index) package
 - [ ] Prepare dataset for training ControlNet in DiffusionSat, follow [ControlNet training example by diffusers](./docs/train_with_diffusers.md) to train diffusionsat that is able to execute in painting task (i.e. generated post-event image with given pre-event image as shown in [paper](./readings/DiffusionSAT/Khanna%20et%20al_2023_DiffusionSat.pdf))
+
+### July<sup>14th</sup>
+
+To-do List:
+
+- [x] Using `diffusers` pipeline unified all projects into `SD-All` including SD v2.1, SD XL Turbo, SD 3 and DiffusionSat
+- [ ] ...
