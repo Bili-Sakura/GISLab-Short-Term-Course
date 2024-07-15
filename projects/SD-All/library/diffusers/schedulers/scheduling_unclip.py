@@ -1,4 +1,4 @@
-# Copyright 2024 Kakao Brain and The HuggingFace Team. All rights reserved.
+# Copyright 2023 Kakao Brain and The HuggingFace Team. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,8 +20,7 @@ import numpy as np
 import torch
 
 from ..configuration_utils import ConfigMixin, register_to_config
-from ..utils import BaseOutput
-from ..utils.torch_utils import randn_tensor
+from ..utils import BaseOutput, randn_tensor
 from .scheduling_utils import SchedulerMixin
 
 
@@ -29,27 +28,23 @@ from .scheduling_utils import SchedulerMixin
 # Copied from diffusers.schedulers.scheduling_ddpm.DDPMSchedulerOutput with DDPM->UnCLIP
 class UnCLIPSchedulerOutput(BaseOutput):
     """
-    Output class for the scheduler's `step` function output.
+    Output class for the scheduler's step function output.
 
     Args:
-        prev_sample (`torch.Tensor` of shape `(batch_size, num_channels, height, width)` for images):
-            Computed sample `(x_{t-1})` of previous timestep. `prev_sample` should be used as next model input in the
+        prev_sample (`torch.FloatTensor` of shape `(batch_size, num_channels, height, width)` for images):
+            Computed sample (x_{t-1}) of previous timestep. `prev_sample` should be used as next model input in the
             denoising loop.
-        pred_original_sample (`torch.Tensor` of shape `(batch_size, num_channels, height, width)` for images):
-            The predicted denoised sample `(x_{0})` based on the model output from the current timestep.
+        pred_original_sample (`torch.FloatTensor` of shape `(batch_size, num_channels, height, width)` for images):
+            The predicted denoised sample (x_{0}) based on the model output from the current timestep.
             `pred_original_sample` can be used to preview progress or for guidance.
     """
 
-    prev_sample: torch.Tensor
-    pred_original_sample: Optional[torch.Tensor] = None
+    prev_sample: torch.FloatTensor
+    pred_original_sample: Optional[torch.FloatTensor] = None
 
 
 # Copied from diffusers.schedulers.scheduling_ddpm.betas_for_alpha_bar
-def betas_for_alpha_bar(
-    num_diffusion_timesteps,
-    max_beta=0.999,
-    alpha_transform_type="cosine",
-):
+def betas_for_alpha_bar(num_diffusion_timesteps, max_beta=0.999):
     """
     Create a beta schedule that discretizes the given alpha_t_bar function, which defines the cumulative product of
     (1-beta) over time from t = [0,1].
@@ -62,38 +57,24 @@ def betas_for_alpha_bar(
         num_diffusion_timesteps (`int`): the number of betas to produce.
         max_beta (`float`): the maximum beta to use; use values lower than 1 to
                      prevent singularities.
-        alpha_transform_type (`str`, *optional*, default to `cosine`): the type of noise schedule for alpha_bar.
-                     Choose from `cosine` or `exp`
 
     Returns:
         betas (`np.ndarray`): the betas used by the scheduler to step the model outputs
     """
-    if alpha_transform_type == "cosine":
 
-        def alpha_bar_fn(t):
-            return math.cos((t + 0.008) / 1.008 * math.pi / 2) ** 2
-
-    elif alpha_transform_type == "exp":
-
-        def alpha_bar_fn(t):
-            return math.exp(t * -12.0)
-
-    else:
-        raise ValueError(f"Unsupported alpha_transform_type: {alpha_transform_type}")
+    def alpha_bar(time_step):
+        return math.cos((time_step + 0.008) / 1.008 * math.pi / 2) ** 2
 
     betas = []
     for i in range(num_diffusion_timesteps):
         t1 = i / num_diffusion_timesteps
         t2 = (i + 1) / num_diffusion_timesteps
-        betas.append(min(1 - alpha_bar_fn(t2) / alpha_bar_fn(t1), max_beta))
+        betas.append(min(1 - alpha_bar(t2) / alpha_bar(t1), max_beta))
     return torch.tensor(betas, dtype=torch.float32)
 
 
 class UnCLIPScheduler(SchedulerMixin, ConfigMixin):
     """
-    NOTE: do not use this scheduler. The DDPM scheduler has been updated to support the changes made here. This
-    scheduler will be removed and replaced with DDPM.
-
     This is a modified DDPM Scheduler specifically for the karlo unCLIP model.
 
     This scheduler has some minor variations in how it calculates the learned range variance and dynamically
@@ -146,17 +127,17 @@ class UnCLIPScheduler(SchedulerMixin, ConfigMixin):
 
         self.variance_type = variance_type
 
-    def scale_model_input(self, sample: torch.Tensor, timestep: Optional[int] = None) -> torch.Tensor:
+    def scale_model_input(self, sample: torch.FloatTensor, timestep: Optional[int] = None) -> torch.FloatTensor:
         """
         Ensures interchangeability with schedulers that need to scale the denoising model input depending on the
         current timestep.
 
         Args:
-            sample (`torch.Tensor`): input sample
+            sample (`torch.FloatTensor`): input sample
             timestep (`int`, optional): current timestep
 
         Returns:
-            `torch.Tensor`: scaled input sample
+            `torch.FloatTensor`: scaled input sample
         """
         return sample
 
@@ -215,9 +196,9 @@ class UnCLIPScheduler(SchedulerMixin, ConfigMixin):
 
     def step(
         self,
-        model_output: torch.Tensor,
+        model_output: torch.FloatTensor,
         timestep: int,
-        sample: torch.Tensor,
+        sample: torch.FloatTensor,
         prev_timestep: Optional[int] = None,
         generator=None,
         return_dict: bool = True,
@@ -227,9 +208,9 @@ class UnCLIPScheduler(SchedulerMixin, ConfigMixin):
         process from the learned model outputs (most often the predicted noise).
 
         Args:
-            model_output (`torch.Tensor`): direct output from learned diffusion model.
+            model_output (`torch.FloatTensor`): direct output from learned diffusion model.
             timestep (`int`): current discrete timestep in the diffusion chain.
-            sample (`torch.Tensor`):
+            sample (`torch.FloatTensor`):
                 current instance of sample being created by diffusion process.
             prev_timestep (`int`, *optional*): The previous timestep to predict the previous sample at.
                 Used to dynamically compute beta. If not given, `t-1` is used and the pre-computed beta is used.
@@ -323,30 +304,3 @@ class UnCLIPScheduler(SchedulerMixin, ConfigMixin):
             return (pred_prev_sample,)
 
         return UnCLIPSchedulerOutput(prev_sample=pred_prev_sample, pred_original_sample=pred_original_sample)
-
-    # Copied from diffusers.schedulers.scheduling_ddpm.DDPMScheduler.add_noise
-    def add_noise(
-        self,
-        original_samples: torch.Tensor,
-        noise: torch.Tensor,
-        timesteps: torch.IntTensor,
-    ) -> torch.Tensor:
-        # Make sure alphas_cumprod and timestep have same device and dtype as original_samples
-        # Move the self.alphas_cumprod to device to avoid redundant CPU to GPU data movement
-        # for the subsequent add_noise calls
-        self.alphas_cumprod = self.alphas_cumprod.to(device=original_samples.device)
-        alphas_cumprod = self.alphas_cumprod.to(dtype=original_samples.dtype)
-        timesteps = timesteps.to(original_samples.device)
-
-        sqrt_alpha_prod = alphas_cumprod[timesteps] ** 0.5
-        sqrt_alpha_prod = sqrt_alpha_prod.flatten()
-        while len(sqrt_alpha_prod.shape) < len(original_samples.shape):
-            sqrt_alpha_prod = sqrt_alpha_prod.unsqueeze(-1)
-
-        sqrt_one_minus_alpha_prod = (1 - alphas_cumprod[timesteps]) ** 0.5
-        sqrt_one_minus_alpha_prod = sqrt_one_minus_alpha_prod.flatten()
-        while len(sqrt_one_minus_alpha_prod.shape) < len(original_samples.shape):
-            sqrt_one_minus_alpha_prod = sqrt_one_minus_alpha_prod.unsqueeze(-1)
-
-        noisy_samples = sqrt_alpha_prod * original_samples + sqrt_one_minus_alpha_prod * noise
-        return noisy_samples
