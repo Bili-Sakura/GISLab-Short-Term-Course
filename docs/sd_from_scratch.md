@@ -166,20 +166,24 @@ pip install -r requirements.txt
 
 #### Setup conda env from Windows to Linux
 
-1. Install Ubuntu on Windows 
+1. Install Ubuntu on Windows
 
-	The following commands are executed in Ubuntu.
+ The following commands are executed in Ubuntu.
 
 1. Create conda env named `sd-all`
 
     ```bash
-    conda create -n sd-all python=3.10 pip cudatollkit pytorch torchvision numpy -c pytorch -c defaults
+    conda create -n sd-all python=3.10
     ```
 
-2. Install more packages
+3. Install more packages
 
     ```bash
-    pip install transformers troch accelerate xformers
+    conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
+    pip install transformers accelerate safetensors ipykernel tensorboard
+    conda install -c conda-forge diffusers
+    conda install xformers -c xformers
+    conda install -c huggingface -c conda-forge datasets
     ```
 
 3. Install conda-pack to wrap up conda env from Windows to Linux
@@ -205,29 +209,7 @@ pip install -r requirements.txt
    ```bash
    mkdir -p /home/gis2024/.conda/envs/sd-all # create a empty folder named sd-all in conda envs directory
    tar -xzf sd-all.tar.gz -C /home/gis2024/.conda/envs/sd-all #unpack env
+   /home/gis2024/.conda/envs/sd-all/bin/conda-unpack
    ```
-   
+
 ### Generate your first image with diffusers' pipeline
-
-   ```python
-   # ./test/sd2_text_image.py
-   import sys
-   
-   sys.path.append("/home/gis2024/local/Group1/SD-All/library/")
-   from diffusers import DiffusionPipeline, DPMSolverMultistepScheduler
-   import torch
-   
-   model_path = "./models/stabilityai/stable-diffusion-2-1"
-   pipe = DiffusionPipeline.from_pretrained(model_path, torch_dtype=torch.float16)
-   
-   pipe.scheduler = DPMSolverMultistepScheduler.from_config(pipe.scheduler.config)
-   pipe = pipe.to("cuda")
-   
-   prompt = "High quality photo of an astronaut riding a horse in space"
-   image = pipe(prompt, num_inference_steps=25).images[0]
-   image.save("output.png")
-   ```
-
-
-
-For more details, see [SD-All](./projects/SD-All/README.md) project codes
