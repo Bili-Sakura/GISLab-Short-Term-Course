@@ -763,6 +763,72 @@ Output：output_India_8 to 11
     <p>small scale</p>
   </div>
 </div>
+
+### Prompt Weighting
+
+> sequence: DiffusionSat/SDv2
+> to control variables, the same seed is used when generating images.
+
+```
+(1) Prompt: A satellite image of Indian farmland suffering from floods, with one building in the image
+    Output: diffusionsat_weighting_1 & sd2_weighting_1
+(2) Prompt: A satellite image of Indian farmland suffering from floods, with one++++ building in the image
+    Output: diffusionsat_weighting_2 & sd2_weighting_2
+(3) Prompt: A satellite image of Indian farmland suffering from floods, with one building++++ in the image
+    Output: diffusionsat_weighting_3 & sd2_weighting_3
+```
+
+<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center;">
+  <!-- 第一列 -->
+  <div>
+    <img src="assets/discussion-img/diffusionsat_weighting_1.png" alt="Image 1" style="width: 100%; height: auto;">
+    <img src="assets/discussion-img/sd2_weighting_1.png" alt="Image 2" style="width: 100%; height: auto;">
+    <p>one building</p>
+  </div>
+  <!-- 第二列 -->
+  <div>
+    <img src="assets/discussion-img/diffusionsat_weighting_2.png" alt="Image 3" style="width: 100%; height: auto;">
+    <img src="assets/discussion-img/sd2_weighting_2.png" alt="Image 4" style="width: 100%; height: auto;">
+    <p>one++++ building</p>
+  </div>
+  <!-- 第三列 -->
+  <div>
+    <img src="assets/discussion-img/diffusionsat_weighting_3.png" alt="Image 3" style="width: 100%; height: auto;">
+    <img src="assets/discussion-img/sd2_weighting_3.png" alt="Image 4" style="width: 100%; height: auto;">
+    <p>one building++++</p>
+  </div>
+</div>
+
+```
+(4) Prompt: A satellite image of Indian farmland suffering from floods, with thick cloud covering the image
+    Output: diffusionsat_weighting_4 & sd2_weighting_4
+(5) Prompt: A satellite image of Indian farmland suffering from floods, with thick++++ cloud covering the image
+    Output: diffusionsat_weighting_5 & sd2_weighting_5
+(6) Prompt: A satellite image of Indian farmland suffering from floods, with thick cloud++++ covering the image
+    Output: diffusionsat_weighting_6 & sd2_weighting_6
+```
+
+<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center;">
+  <!-- 第一列 -->
+  <div>
+    <img src="assets/discussion-img/diffusionsat_weighting_4.png" alt="Image 1" style="width: 100%; height: auto;">
+    <img src="assets/discussion-img/sd2_weighting_4.png" alt="Image 2" style="width: 100%; height: auto;">
+    <p>thick cloud</p>
+  </div>
+  <!-- 第二列 -->
+  <div>
+    <img src="assets/discussion-img/diffusionsat_weighting_5.png" alt="Image 3" style="width: 100%; height: auto;">
+    <img src="assets/discussion-img/sd2_weighting_5.png" alt="Image 4" style="width: 100%; height: auto;">
+    <p>thick++++ cloud</p>
+  </div>
+  <!-- 第三列 -->
+  <div>
+    <img src="assets/discussion-img/diffusionsat_weighting_6.png" alt="Image 5" style="width: 100%; height: auto;">
+    <img src="assets/discussion-img/sd2_weighting_6.png" alt="Image 6" style="width: 100%; height: auto;">
+    <p>thick cloud++++</p>
+  </div>
+</div>
+
 ## 7.4Training@sakura
 
 Example: Training ControlNet with Diffusers: [Web Link](https://github.com/huggingface/diffusers/tree/main/examples/controlnet) / [Local Doc](./docs/train_with_diffusers/md)
