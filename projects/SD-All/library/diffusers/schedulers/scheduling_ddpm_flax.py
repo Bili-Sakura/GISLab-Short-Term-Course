@@ -1,4 +1,4 @@
-# Copyright 2024 UC Berkeley Team and The HuggingFace Team. All rights reserved.
+# Copyright 2023 UC Berkeley Team and The HuggingFace Team. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -198,7 +198,7 @@ class FlaxDDPMScheduler(FlaxSchedulerMixin, ConfigMixin):
         model_output: jnp.ndarray,
         timestep: int,
         sample: jnp.ndarray,
-        key: Optional[jax.Array] = None,
+        key: Optional[jax.random.KeyArray] = None,
         return_dict: bool = True,
     ) -> Union[FlaxDDPMSchedulerOutput, Tuple]:
         """
@@ -211,7 +211,7 @@ class FlaxDDPMScheduler(FlaxSchedulerMixin, ConfigMixin):
             timestep (`int`): current discrete timestep in the diffusion chain.
             sample (`jnp.ndarray`):
                 current instance of sample being created by diffusion process.
-            key (`jax.Array`): a PRNG key.
+            key (`jax.random.KeyArray`): a PRNG key.
             return_dict (`bool`): option for returning tuple rather than FlaxDDPMSchedulerOutput class
 
         Returns:
@@ -222,13 +222,9 @@ class FlaxDDPMScheduler(FlaxSchedulerMixin, ConfigMixin):
         t = timestep
 
         if key is None:
-            key = jax.random.key(0)
+            key = jax.random.PRNGKey(0)
 
-        if (
-            len(model_output.shape) > 1
-            and model_output.shape[1] == sample.shape[1] * 2
-            and self.config.variance_type in ["learned", "learned_range"]
-        ):
+        if model_output.shape[1] == sample.shape[1] * 2 and self.config.variance_type in ["learned", "learned_range"]:
             model_output, predicted_variance = jnp.split(model_output, sample.shape[1], axis=1)
         else:
             predicted_variance = None
@@ -268,7 +264,7 @@ class FlaxDDPMScheduler(FlaxSchedulerMixin, ConfigMixin):
 
         # 6. Add noise
         def random_variance():
-            split_key = jax.random.split(key, num=1)[0]
+            split_key = jax.random.split(key, num=1)
             noise = jax.random.normal(split_key, shape=model_output.shape, dtype=self.dtype)
             return (self._get_variance(state, t, predicted_variance=predicted_variance) ** 0.5) * noise
 

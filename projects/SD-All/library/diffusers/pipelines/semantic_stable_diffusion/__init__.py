@@ -1,49 +1,31 @@
-from typing import TYPE_CHECKING
+from dataclasses import dataclass
+from enum import Enum
+from typing import List, Optional, Union
 
-from ...utils import (
-    DIFFUSERS_SLOW_IMPORT,
-    OptionalDependencyNotAvailable,
-    _LazyModule,
-    get_objects_from_module,
-    is_torch_available,
-    is_transformers_available,
-)
+import numpy as np
+import PIL
+from PIL import Image
 
-
-_dummy_objects = {}
-_import_structure = {}
-
-try:
-    if not (is_transformers_available() and is_torch_available()):
-        raise OptionalDependencyNotAvailable()
-except OptionalDependencyNotAvailable:
-    from ...utils import dummy_torch_and_transformers_objects  # noqa F403
-
-    _dummy_objects.update(get_objects_from_module(dummy_torch_and_transformers_objects))
-else:
-    _import_structure["pipeline_output"] = ["SemanticStableDiffusionPipelineOutput"]
-    _import_structure["pipeline_semantic_stable_diffusion"] = ["SemanticStableDiffusionPipeline"]
+from ...utils import BaseOutput, is_torch_available, is_transformers_available
 
 
-if TYPE_CHECKING or DIFFUSERS_SLOW_IMPORT:
-    try:
-        if not (is_transformers_available() and is_torch_available()):
-            raise OptionalDependencyNotAvailable()
+@dataclass
+class SemanticStableDiffusionPipelineOutput(BaseOutput):
+    """
+    Output class for Stable Diffusion pipelines.
 
-    except OptionalDependencyNotAvailable:
-        from ...utils.dummy_torch_and_transformers_objects import *
-    else:
-        from .pipeline_semantic_stable_diffusion import SemanticStableDiffusionPipeline
+    Args:
+        images (`List[PIL.Image.Image]` or `np.ndarray`)
+            List of denoised PIL images of length `batch_size` or numpy array of shape `(batch_size, height, width,
+            num_channels)`. PIL images or numpy array present the denoised images of the diffusion pipeline.
+        nsfw_content_detected (`List[bool]`)
+            List of flags denoting whether the corresponding generated image likely represents "not-safe-for-work"
+            (nsfw) content, or `None` if safety checking could not be performed.
+    """
 
-else:
-    import sys
+    images: Union[List[PIL.Image.Image], np.ndarray]
+    nsfw_content_detected: Optional[List[bool]]
 
-    sys.modules[__name__] = _LazyModule(
-        __name__,
-        globals()["__file__"],
-        _import_structure,
-        module_spec=__spec__,
-    )
 
-    for name, value in _dummy_objects.items():
-        setattr(sys.modules[__name__], name, value)
+if is_transformers_available() and is_torch_available():
+    from .pipeline_semantic_stable_diffusion import SemanticStableDiffusionPipeline

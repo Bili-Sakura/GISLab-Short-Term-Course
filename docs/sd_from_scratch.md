@@ -213,4 +213,3 @@ pip install -r requirements.txt
    
 ### Generate your first image with diffusers' pipeline
 
-   tar -xzf sd-all.tar.gz ./sd-all
