@@ -179,7 +179,7 @@ pip install -r requirements.txt
 2. Install more packages
 
     ```bash
-    pip install transformers troch accelerate xformers
+    pip install transformers torch accelerate xformers
     ```
 
 3. Install conda-pack to wrap up conda env from Windows to Linux
@@ -205,6 +205,7 @@ pip install -r requirements.txt
    ```bash
    mkdir -p /home/gis2024/.conda/envs/sd-all # create a empty folder named sd-all in conda envs directory
    tar -xzf sd-all.tar.gz -C /home/gis2024/.conda/envs/sd-all #unpack env
+   /home/gis2024/.conda/envs/sd-all/bin/conda-unpack
    ```
    
 ### Generate your first image with diffusers' pipeline
