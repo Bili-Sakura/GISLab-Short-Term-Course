@@ -173,13 +173,17 @@ pip install -r requirements.txt
 1. Create conda env named `sd-all`
 
     ```bash
-    conda create -n sd-all python=3.10 pip cudatollkit pytorch torchvision numpy -c pytorch -c defaults
+    conda create -n sd-all python=3.10
     ```
 
-2. Install more packages
+3. Install more packages
 
     ```bash
-    pip install transformers troch accelerate xformers
+    conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
+    pip install transformers accelerate safetensors ipykernel tensorboard
+    conda install -c conda-forge diffusers
+    conda install xformers -c xformers
+    conda install -c huggingface -c conda-forge datasets
     ```
 
 3. Install conda-pack to wrap up conda env from Windows to Linux
@@ -209,4 +213,4 @@ pip install -r requirements.txt
    
 ### Generate your first image with diffusers' pipeline
 
-   1
+   tar -xzf sd-all.tar.gz ./sd-all
