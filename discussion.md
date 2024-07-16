@@ -833,3 +833,69 @@ Output：output_India_8 to 11
 
 Example: Training ControlNet with Diffusers: [Web Link](https://github.com/huggingface/diffusers/tree/main/examples/controlnet) / [Local Doc](./docs/train_with_diffusers.md)
 
+## 7.16@sakura
+
+### How to read TIFF file and display
+
+
+
+> [Working with TIFF files (kaggle.com)](https://www.kaggle.com/code/yassinealouini/working-with-tiff-files)
+
+```python
+from torchvision.transforms import ToTensor
+import rasterio
+from rasterio.plot import show
+import numpy as np
+
+# Path to the .tiff file
+path = "./input/hurricane-harvey_00000000_post_disaster.tif"
+
+# Open the image using rasterio
+with rasterio.open(path) as image:
+    # Read the image data into an array
+    image_array = image.read()
+
+# Convert the image array to a PyTorch tensor
+torch_image = ToTensor()(image_array)
+print(torch_image.shape)
+show(image_array)
+```
+
+matploylib
+
+```python
+import matplotlib.pyplot as plt
+from PIL import Image
+
+# Load images using PIL
+image1 = Image.open('./input/6544.jpg')
+image2 = Image.open('./input/6546.jpg')
+image3 = Image.open('./input/6548.jpg')
+image4 = Image.open('./input/6549.jpg')
+
+
+# Create figure and axes
+fig, axes = plt.subplots(1, 4, figsize=(20, 5))
+
+# Display images with captions
+axes[0].imshow(image1)
+axes[0].set_title('Caption 1')
+axes[0].axis('off')
+
+axes[1].imshow(image2)
+axes[1].set_title('Caption 2')
+axes[1].axis('off')
+
+axes[2].imshow(image3)
+axes[2].set_title('Caption 3')
+axes[2].axis('off')
+
+axes[3].imshow(image4)
+axes[3].set_title('Caption 4')
+axes[3].axis('off')
+
+plt.tight_layout()
+plt.show()
+
+```
+
