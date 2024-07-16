@@ -9,16 +9,13 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 
-import sys
-import os
-sys.path.append('/home/gis2024/local/Group1/SD-All/library/')
 
-from diffusers.configuration_utils import ConfigMixin, register_to_config
-from diffusers.utils import BaseOutput, logging
-from diffusers.models.attention_processor import AttentionProcessor, AttnProcessor
-from diffusers.models.embeddings import TimestepEmbedding, Timesteps
-from diffusers.models.modeling_utils import ModelMixin
-from diffusers.models.unet_2d_blocks import (
+from library.diffusers.configuration_utils import ConfigMixin, register_to_config
+from library.diffusers.utils import BaseOutput, logging
+from library.diffusers.models.attention_processor import AttentionProcessor, AttnProcessor
+from library.diffusers.models.embeddings import TimestepEmbedding, Timesteps
+from library.diffusers.models.modeling_utils import ModelMixin
+from library.diffusers.models.unet_2d_blocks import (
     CrossAttnDownBlock2D,
     DownBlock2D,
     UNetMidBlock2DCrossAttn,
@@ -334,7 +331,7 @@ class ControlNetModel(ModelMixin, ConfigMixin):
         return controlnet
 
     @property
-    # Copied from diffusers.models.unet_2d_condition.UNet2DConditionModel.attn_processors
+    # Copied from library.diffusers.models.unet_2d_condition.UNet2DConditionModel.attn_processors
     def attn_processors(self) -> Dict[str, AttentionProcessor]:
         r"""
         Returns:
@@ -358,7 +355,7 @@ class ControlNetModel(ModelMixin, ConfigMixin):
 
         return processors
 
-    # Copied from diffusers.models.unet_2d_condition.UNet2DConditionModel.set_attn_processor
+    # Copied from library.diffusers.models.unet_2d_condition.UNet2DConditionModel.set_attn_processor
     def set_attn_processor(self, processor: Union[AttentionProcessor, Dict[str, AttentionProcessor]]):
         r"""
         Parameters:
@@ -389,14 +386,14 @@ class ControlNetModel(ModelMixin, ConfigMixin):
         for name, module in self.named_children():
             fn_recursive_attn_processor(name, module, processor)
 
-    # Copied from diffusers.models.unet_2d_condition.UNet2DConditionModel.set_default_attn_processor
+    # Copied from library.diffusers.models.unet_2d_condition.UNet2DConditionModel.set_default_attn_processor
     def set_default_attn_processor(self):
         """
         Disables custom attention processors and sets the default attention implementation.
         """
         self.set_attn_processor(AttnProcessor())
 
-    # Copied from diffusers.models.unet_2d_condition.UNet2DConditionModel.set_attention_slice
+    # Copied from library.diffusers.models.unet_2d_condition.UNet2DConditionModel.set_attention_slice
     def set_attention_slice(self, slice_size):
         r"""
         Enable sliced attention computation.

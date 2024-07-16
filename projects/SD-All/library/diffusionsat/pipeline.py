@@ -9,17 +9,13 @@ import torch
 from packaging import version
 from transformers import CLIPFeatureExtractor, CLIPTextModel, CLIPTokenizer
 
-import sys
-import os
-sys.path.append('/home/gis2024/local/Group1/SD-All/library/')
-
-from diffusers.configuration_utils import FrozenDict
-from diffusers.models import AutoencoderKL, UNet2DConditionModel
-from diffusers.schedulers import KarrasDiffusionSchedulers
-from diffusers.utils import deprecate, is_accelerate_available, logging, randn_tensor, replace_example_docstring
-from diffusers.pipelines.pipeline_utils import DiffusionPipeline
-from diffusers.pipelines.stable_diffusion import StableDiffusionPipelineOutput
-from diffusers.pipelines.stable_diffusion.safety_checker import StableDiffusionSafetyChecker
+from library.diffusers.configuration_utils import FrozenDict
+from library.diffusers.models import AutoencoderKL, UNet2DConditionModel
+from library.diffusers.schedulers import KarrasDiffusionSchedulers
+from library.diffusers.utils import deprecate, is_accelerate_available, logging, randn_tensor, replace_example_docstring
+from library.diffusers.pipelines.pipeline_utils import DiffusionPipeline
+from library.diffusers.pipelines.stable_diffusion import StableDiffusionPipelineOutput
+from library.diffusers.pipelines.stable_diffusion.safety_checker import StableDiffusionSafetyChecker
 
 from .sat_unet import SatUNet
 
@@ -30,7 +26,7 @@ EXAMPLE_DOC_STRING = """
     Examples:
         ```py
         >>> import torch
-        >>> from diffusers import StableDiffusionPipeline
+        >>> from library.diffusers import StableDiffusionPipeline
 
         >>> pipe = StableDiffusionPipeline.from_pretrained("runwayml/stable-diffusion-v1-5", torch_dtype=torch.float16)
         >>> pipe = pipe.to("cuda")
