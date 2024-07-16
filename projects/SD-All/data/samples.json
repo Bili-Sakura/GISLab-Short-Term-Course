@@ -1,0 +1,24 @@
+[
+    {
+        "model_name": "sd2",
+        "prompt": "High quality photo of an astronaut riding a horse in space",
+        "output_path": "./out/sd2_example.png",
+        "num_inference_steps": 10
+    },
+    {
+        "model_name": "sdxl_turbo",
+        "prompt": "A cinematic shot of a baby racoon wearing an intricate italian priest robe.",
+        "output_path": "./out/sdxl-turbo_example.png",
+        "num_inference_steps": 1,
+        "guidance_scale": 0.0
+    },
+    {
+        "model_name": "sd3",
+        "prompt": "a photo of a cat holding a sign that says hello world",
+        "output_path": "./out/sd3_example.png",
+        "num_inference_steps": 10,
+        "guidance_scale": 7.0,
+        "height": 512,
+        "width": 512
+    }
+]
