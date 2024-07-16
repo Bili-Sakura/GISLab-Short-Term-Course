@@ -3,7 +3,6 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers.json import JsonOutputParser
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain.globals import set_verbose, get_verbose
-from langchain_glm import ChatZhipuAI
 import os
 from dotenv import load_dotenv
 import json
@@ -11,15 +10,12 @@ import json
 load_dotenv()
 # Get the API keys from environment variables
 openai_api_key = os.getenv("OPENAI_API_KEY")
-zhipuai_api_key = os.getenv("ZHIPUAI_API_KEY")
 deepseek_api_key = os.getenv("DEEPSEEK_API_KEY")
 set_verbose(value=True)  # Enable verbose mode
 
 
 def generate_items():
     # Initialize the model
-    # model = ChatOpenAI(model="glm-4-turbo", api_key="")
-    # model = ChatOpenAI(model="gpt-3.5-turbo")
     model = ChatOpenAI(
         model="deepseek-chat",
         api_key=deepseek_api_key,
@@ -27,7 +23,7 @@ def generate_items():
         # max_tokens=1024,
     )
     # Create a prompt template
-    system_template = "Generate 10 cities in JSON format with fields name and country:"
+    system_template = "Generate 10 cities in JSON format with fields name, country, latitude, and longitude:"
     prompt_template = ChatPromptTemplate.from_messages(
         [("system", system_template), ("user", "")]
     )
@@ -40,10 +36,12 @@ def generate_items():
     response = chain.invoke({"text": ""})
 
     # Process the response
-    items_json = json.dumps(response, indent=4)
+    cities_json = json.dumps(response, indent=4)
 
     # Save the generated items to a JSON file
-    with open("data/items.json", "w") as f:
-        f.write(items_json)
+    with open("data/cities.json", "w") as f:
+        f.write(cities_json)
 
-    return items_json
+    return cities_json
+
+
