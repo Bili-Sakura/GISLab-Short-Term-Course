@@ -1,4 +1,4 @@
-# Introducation to DiffusionSat
+# 	Introducation to DiffusionSat
 
 > Project Link: [DiffusionSat (samarkhanna.com)](https://www.samarkhanna.com/DiffusionSat/)
 
