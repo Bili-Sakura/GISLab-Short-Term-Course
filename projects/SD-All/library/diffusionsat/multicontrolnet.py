@@ -13,9 +13,9 @@ import os
 sys.path.append('/home/gis2024/local/Group1/SD-All/library/')
 
 from .controlnet import ControlNetModel, ControlNetOutput
-from diffusers.models.modeling_utils import ModelMixin
-from diffusers.utils import logging
-from diffusers.models.unet_2d_blocks import (
+from library.diffusers.models.modeling_utils import ModelMixin
+from library.diffusers.utils import logging
+from library.diffusers.models.unet_2d_blocks import (
     CrossAttnDownBlock2D,
     DownBlock2D,
 )

@@ -166,9 +166,9 @@ pip install -r requirements.txt
 
 #### Setup conda env from Windows to Linux
 
-1. Install Ubuntu on Windows 
+1. Install Ubuntu on Windows
 
-	The following commands are executed in Ubuntu.
+ The following commands are executed in Ubuntu.
 
 1. Create conda env named `sd-all`
 
@@ -211,9 +211,8 @@ pip install -r requirements.txt
    ```bash
    mkdir -p /home/gis2024/.conda/envs/sd-all # create a empty folder named sd-all in conda envs directory
    tar -xzf sd-all.tar.gz -C /home/gis2024/.conda/envs/sd-all #unpack env
+   /home/gis2024/.conda/envs/sd-all/bin/conda-unpack
    ```
-   
-### Generate your first image with diffusers' pipeline
 
 [Working with TIFF files (kaggle.com)](https://www.kaggle.com/code/yassinealouini/working-with-tiff-files)
 

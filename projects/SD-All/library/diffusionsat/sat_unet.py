@@ -12,15 +12,15 @@ import torch.utils.checkpoint
 import sys
 import os
 # Increase the priority of the added path for sys.path
-sys.path.insert(0, '/home/gis2024/local/Group1/SD-All/library')
+sys.path.insert(0, '/home/gis2024/local/Group1/SD-All')
 # print(sys.path)
-from diffusers.configuration_utils import ConfigMixin, register_to_config
-from diffusers.loaders import UNet2DConditionLoadersMixin
-from diffusers.utils import BaseOutput, logging
-from diffusers.models.attention_processor import AttnProcessor
-from diffusers.models.embeddings import GaussianFourierProjection, TimestepEmbedding, Timesteps
-from diffusers.models.modeling_utils import ModelMixin
-from diffusers.models.unet_2d_blocks import (
+from library.diffusers.configuration_utils import ConfigMixin, register_to_config
+from library.diffusers.loaders import UNet2DConditionLoadersMixin
+from library.diffusers.utils import BaseOutput, logging
+from library.diffusers.models.attention_processor import AttnProcessor
+from library.diffusers.models.embeddings import GaussianFourierProjection, TimestepEmbedding, Timesteps
+from library.diffusers.models.modeling_utils import ModelMixin
+from library.diffusers.models.unet_2d_blocks import (
     CrossAttnDownBlock2D,
     CrossAttnUpBlock2D,
     DownBlock2D,

@@ -1,0 +1,22 @@
+[
+    {
+        "prompt": "A fantasy landscape with mountains and a river",
+        "model_name": "sd2",
+        "metadata": [],
+        "output": "./out/main-test/fantasy_landscape.png"
+    },
+    {
+        "prompt": "An urban satellite image highlighting green spaces in Central Park, New York City",
+        "model_name": "diffusionsat",
+        "metadata": [
+            -73.968285,
+            40.785091,
+            0.920,
+            0.080,
+            2022,
+            5,
+            10
+        ],
+        "output": "./out/main-test/diffusionsat.png"
+    }
+]
