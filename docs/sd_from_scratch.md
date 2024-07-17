@@ -179,7 +179,9 @@ pip install -r requirements.txt
 3. Install more packages
 
     ```bash
-    conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
+    conda install pytorch 
+    conda install torchvision
+    conda install torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
     pip install transformers accelerate safetensors ipykernel tensorboard
     conda install -c conda-forge diffusers
     conda install xformers -c xformers
@@ -212,4 +214,5 @@ pip install -r requirements.txt
    /home/gis2024/.conda/envs/sd-all/bin/conda-unpack
    ```
 
-### Generate your first image with diffusers' pipeline
+[Working with TIFF files (kaggle.com)](https://www.kaggle.com/code/yassinealouini/working-with-tiff-files)
+
