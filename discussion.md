@@ -763,7 +763,139 @@ Output：output_India_8 to 11
     <p>small scale</p>
   </div>
 </div>
-## 7.4Training@sakura
 
-Example: Training ControlNet with Diffusers: [Web Link](https://github.com/huggingface/diffusers/tree/main/examples/controlnet) / [Local Doc](./docs/train_with_diffusers/md)
+### Prompt Weighting
+
+> sequence: DiffusionSat/SDv2
+> to control variables, the same seed is used when generating images.
+
+```
+(1) Prompt: A satellite image of Indian farmland suffering from floods, with one building in the image
+    Output: diffusionsat_weighting_1 & sd2_weighting_1
+(2) Prompt: A satellite image of Indian farmland suffering from floods, with one++++ building in the image
+    Output: diffusionsat_weighting_2 & sd2_weighting_2
+(3) Prompt: A satellite image of Indian farmland suffering from floods, with one building++++ in the image
+    Output: diffusionsat_weighting_3 & sd2_weighting_3
+```
+
+<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center;">
+  <!-- 第一列 -->
+  <div>
+    <img src="assets/discussion-img/diffusionsat_weighting_1.png" alt="Image 1" style="width: 100%; height: auto;">
+    <img src="assets/discussion-img/sd2_weighting_1.png" alt="Image 2" style="width: 100%; height: auto;">
+    <p>one building</p>
+  </div>
+  <!-- 第二列 -->
+  <div>
+    <img src="assets/discussion-img/diffusionsat_weighting_2.png" alt="Image 3" style="width: 100%; height: auto;">
+    <img src="assets/discussion-img/sd2_weighting_2.png" alt="Image 4" style="width: 100%; height: auto;">
+    <p>one++++ building</p>
+  </div>
+  <!-- 第三列 -->
+  <div>
+    <img src="assets/discussion-img/diffusionsat_weighting_3.png" alt="Image 3" style="width: 100%; height: auto;">
+    <img src="assets/discussion-img/sd2_weighting_3.png" alt="Image 4" style="width: 100%; height: auto;">
+    <p>one building++++</p>
+  </div>
+</div>
+
+```
+(4) Prompt: A satellite image of Indian farmland suffering from floods, with thick cloud covering the image
+    Output: diffusionsat_weighting_4 & sd2_weighting_4
+(5) Prompt: A satellite image of Indian farmland suffering from floods, with thick++++ cloud covering the image
+    Output: diffusionsat_weighting_5 & sd2_weighting_5
+(6) Prompt: A satellite image of Indian farmland suffering from floods, with thick cloud++++ covering the image
+    Output: diffusionsat_weighting_6 & sd2_weighting_6
+```
+
+<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center;">
+  <!-- 第一列 -->
+  <div>
+    <img src="assets/discussion-img/diffusionsat_weighting_4.png" alt="Image 1" style="width: 100%; height: auto;">
+    <img src="assets/discussion-img/sd2_weighting_4.png" alt="Image 2" style="width: 100%; height: auto;">
+    <p>thick cloud</p>
+  </div>
+  <!-- 第二列 -->
+  <div>
+    <img src="assets/discussion-img/diffusionsat_weighting_5.png" alt="Image 3" style="width: 100%; height: auto;">
+    <img src="assets/discussion-img/sd2_weighting_5.png" alt="Image 4" style="width: 100%; height: auto;">
+    <p>thick++++ cloud</p>
+  </div>
+  <!-- 第三列 -->
+  <div>
+    <img src="assets/discussion-img/diffusionsat_weighting_6.png" alt="Image 5" style="width: 100%; height: auto;">
+    <img src="assets/discussion-img/sd2_weighting_6.png" alt="Image 6" style="width: 100%; height: auto;">
+    <p>thick cloud++++</p>
+  </div>
+</div>
+
+## 7.14Training@sakura
+
+Example: Training ControlNet with Diffusers: [Web Link](https://github.com/huggingface/diffusers/tree/main/examples/controlnet) / [Local Doc](./docs/train_with_diffusers.md)
+
+## 7.16@sakura
+
+### How to read TIFF file and display
+
+
+
+> [Working with TIFF files (kaggle.com)](https://www.kaggle.com/code/yassinealouini/working-with-tiff-files)
+
+```python
+from torchvision.transforms import ToTensor
+import rasterio
+from rasterio.plot import show
+import numpy as np
+
+# Path to the .tiff file
+path = "./input/hurricane-harvey_00000000_post_disaster.tif"
+
+# Open the image using rasterio
+with rasterio.open(path) as image:
+    # Read the image data into an array
+    image_array = image.read()
+
+# Convert the image array to a PyTorch tensor
+torch_image = ToTensor()(image_array)
+print(torch_image.shape)
+show(image_array)
+```
+
+matploylib
+
+```python
+import matplotlib.pyplot as plt
+from PIL import Image
+
+# Load images using PIL
+image1 = Image.open('./input/6544.jpg')
+image2 = Image.open('./input/6546.jpg')
+image3 = Image.open('./input/6548.jpg')
+image4 = Image.open('./input/6549.jpg')
+
+
+# Create figure and axes
+fig, axes = plt.subplots(1, 4, figsize=(20, 5))
+
+# Display images with captions
+axes[0].imshow(image1)
+axes[0].set_title('Caption 1')
+axes[0].axis('off')
+
+axes[1].imshow(image2)
+axes[1].set_title('Caption 2')
+axes[1].axis('off')
+
+axes[2].imshow(image3)
+axes[2].set_title('Caption 3')
+axes[2].axis('off')
+
+axes[3].imshow(image4)
+axes[3].set_title('Caption 4')
+axes[3].axis('off')
+
+plt.tight_layout()
+plt.show()
+
+```
 
