@@ -117,7 +117,6 @@ To-do List:
 To-do List:
 
 - [x] Using `diffusers` pipeline unified all projects into `SD-All` including SD v2.1, SD XL Turbo, SD 3 and DiffusionSat
-- [ ] ...
 
 ### July<sup>15th</sup>-July<sup>18th</sup>
 
@@ -126,7 +125,6 @@ To-do List:
 - [x] Evaluate the performance of all models with MSE, SSIM, LPIPS and PSNR
 - [x] Using [CogVLM2](https://huggingface.co/THUDM/cogvlm2-llama3-chat-19B) for image captioning
 - [x] Using [T5](https://huggingface.co/google-t5/t5-large) for image captioning summarization
-- [ ] ...
 
 Note:
 
