@@ -939,9 +939,7 @@ CogVLM2 Results
 {
   "disaster": "guatemala-volcano", 
   "image": "guatemala-volcano_00000004_post_disaster.png", 
-  "caption": ""A satellite image reveals the aftermath of a devastating volcanic eruption, where the once verdant landscape has been transformed into a scene of destruction. 
-The eruption's fury has left behind a trail of ash and lava that engulfs parts of a residential area, with homes and infrastructure severely damaged or completely destroyed. 
-The contrast between the untouched green golf course and the devastated land is stark, highlighting the eruption's unpredictable path and the vulnerability of human settlements to such natural disasters."
+  "caption": "A satellite image reveals the aftermath of a devastating volcanic eruption, where the once verdant landscape has been transformed into a scene of destruction. The eruption's fury has left behind a trail of ash and lava that engulfs parts of a residential area, with homes and infrastructure severely damaged or completely destroyed. The contrast between the untouched green golf course and the devastated land is stark, highlighting the eruption's unpredictable path and the vulnerability of human settlements to such natural disasters."
 }
 ```
 
@@ -951,12 +949,8 @@ T5 Results
 {
   "disaster": "guatemala-volcano", 
   "image": "guatemala-volcano_00000004_post_disaster.png", 
-  "caption": "A satellite image reveals the aftermath of a devastating volcanic eruption, where the once verdant landscape has been transformed into a scene of destruction. 
-The eruption's fury has left behind a trail of ash and lava that engulfs parts of a residential area, with homes and infrastructure severely damaged or completely destroyed. 
-The contrast between the untouched green golf course and the devastated land is stark, highlighting the eruption's unpredictable path and the vulnerability of human settlements to such natural disasters.",
-  "caption_short": "satellite image reveals the aftermath of a devastating volcanic eruption. 
-eruption's fury has left behind a trail of ash and lava that engulfs parts of a residential area. 
-contrast between the untouched green golf course and the devastated land is stark."
+  "caption": "A satellite image reveals the aftermath of a devastating volcanic eruption, where the once verdant landscape has been transformed into a scene of destruction. The eruption's fury has left behind a trail of ash and lava that engulfs parts of a residential area, with homes and infrastructure severely damaged or completely destroyed. The contrast between the untouched green golf course and the devastated land is stark, highlighting the eruption's unpredictable path and the vulnerability of human settlements to such natural disasters.",
+  "caption_short": "satellite image reveals the aftermath of a devastating volcanic eruption. eruption's fury has left behind a trail of ash and lava that engulfs parts of a residential area. contrast between the untouched green golf course and the devastated land is stark."
 }
 ```
 
