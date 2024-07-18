@@ -1,0 +1,52 @@
+[
+    {
+        "disaster": "guatemala-volcano",
+        "image": "guatemala-volcano_00000004_post_disaster.png",
+        "caption": "A satellite image reveals the aftermath of a devastating volcanic eruption, where the once verdant landscape has been transformed into a scene of destruction. The darkened, ash-covered terrain starkly contrasts with the untouched green golf course to the right, a testament to the eruption's selective impact. Roads and structures are either buried under thick layers of ash or appear charred, indicating the proximity and intensity of the eruption. The image underscores the importance of preparedness and the need for evacuation plans in areas at risk of volcanic activity."
+    },
+    {
+        "disaster": "guatemala-volcano",
+        "image": "guatemala-volcano_00000004_pre_disaster.png",
+        "caption": "A satellite image reveals a sprawling golf course nestled amidst lush greenery, with a cluster of residential buildings at its heart, all seemingly undisturbed by the looming presence of a thick, white cloud of ash that envelops the area, a stark contrast to the vibrant greens below. This cloud, indicative of a nearby volcanic eruption, threatens to engulf the landscape, signaling the imminent arrival of ashfall that could disrupt the course and endanger the residents."
+    },
+    {
+        "disaster": "guatemala-volcano",
+        "image": "guatemala-volcano_00000012_post_disaster.png",
+        "caption": "A satellite image reveals the aftermath of a devastating volcanic eruption in a densely populated area. The brown, muddy path of the lava flow starkly contrasts with the vibrant green of the surrounding vegetation. Roads are disrupted, with some areas completely covered by the volcanic debris, while others remain clear, indicating the lava's unpredictable movement. The nearby settlement appears to have suffered significant damage, with buildings possibly destroyed or heavily damaged by the lava flow. The image underscores the importance of preparedness and evacuation plans in areas prone to natural disasters."
+    },
+    {
+        "disaster": "guatemala-volcano",
+        "image": "guatemala-volcano_00000012_pre_disaster.png",
+        "caption": "This satellite image captures a landscape before a volcanic disaster, revealing a stark contrast between the untouched and the affected areas. On the left, lush greenery and a winding river suggest a thriving ecosystem, while the right side shows the devastating impact of the impending eruption. The land is barren, with ash covering the ground, and the riverbed is filled with volcanic debris, indicating the immediate aftermath of the eruption. The juxtaposition of the two areas serves as a powerful reminder of the destructive power of nature and the importance of preparedness."
+    },
+    {
+        "disaster": "guatemala-volcano",
+        "image": "guatemala-volcano_00000014_post_disaster.png",
+        "caption": "This satellite image captures the aftermath of a devastating volcanic eruption. The landscape is a stark contrast of destruction and resilience. The darkened areas, which are likely the hardened lava flows, are interspersed with patches of green, indicating the slow return of vegetation. A winding road, barely visible through the thick smoke, snakes through the disaster zone, hinting at the challenges of transportation and recovery efforts. The presence of structures and vehicles suggests that some areas have been cleared and are being readied for rebuilding. The image is a poignant reminder of nature's power and the human spirit's determination to rebuild and recover."
+    },
+    {
+        "disaster": "guatemala-volcano",
+        "image": "guatemala-volcano_00000014_pre_disaster.png",
+        "caption": "This satellite image captures the landscape before the eruption of a volcano. The terrain is a mix of lush greenery and barren land, indicating a possible agricultural area. A winding road cuts through the landscape, with vehicles suggesting human activity. Adjacent to the road, there's a cluster of buildings, possibly a small community or a facility. The absence of any visible lava flows or ash clouds suggests that the volcano has not erupted at the time the image was captured."
+    },
+    {
+        "disaster": "guatemala-volcano",
+        "image": "guatemala-volcano_00000020_post_disaster.png",
+        "caption": "A satellite image reveals the aftermath of a devastating volcanic eruption, where a vast expanse of darkened land stretches out, starkly contrasting with the untouched greenery to its left. The eruption's impact is evident in the thick, ash-covered terrain, with patterns suggesting the flow of molten lava or ash. To the right, a row of greenhouses stands resilient, their white roofs gleaming under the sunlight, a testament to human perseverance and the importance of preparedness."
+    },
+    {
+        "disaster": "guatemala-volcano",
+        "image": "guatemala-volcano_00000020_pre_disaster.png",
+        "caption": "A satellite image captured before the eruption of a volcano reveals a stark contrast between human habitation and the raw power of nature. On the left, a neatly organized residential area with uniform houses and green spaces stands in sharp relief to the right, where the earth's crust has been torn apart, revealing layers of ash and rock. The serpentine river, now filled with volcanic debris, snakes through the landscape, a testament to the volcano's might. This image underscores the importance of preparedness and the fragility of human settlements in the face of natural disasters."
+    },
+    {
+        "disaster": "guatemala-volcano",
+        "image": "guatemala-volcano_00000022_post_disaster.png",
+        "caption": "A satellite image reveals the aftermath of a devastating volcanic eruption, with a stark contrast between the untouched green fields and the devastated landscape. The darkened, muddy path of the lava flow, which has engulfed a significant portion of the land, is evident. Surrounding the lava flow, the lush greenery remains largely intact, highlighting the uneven impact of the eruption. The immediate vicinity of the disaster shows signs of infrastructure damage, with buildings and roads affected. The scene underscores the importance of preparedness and the need for immediate response in the face of natural disasters."
+    },
+    {
+        "disaster": "guatemala-volcano",
+        "image": "guatemala-volcano_00000022_pre_disaster.png",
+        "caption": "This satellite image captures the aftermath of a volcanic eruption, revealing a stark contrast between the untouched green fields and the devastated landscape. The darkened, ash-covered area adjacent to the river shows the extent of the eruption's reach, with the river itself appearing murky due to the volcanic debris. Roads and infrastructure are visible, but the immediate vicinity of the eruption site is heavily impacted, indicating the need for immediate response and recovery efforts."
+    }
+]
