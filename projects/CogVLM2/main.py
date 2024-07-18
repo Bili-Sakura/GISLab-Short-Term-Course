@@ -24,6 +24,15 @@ def extract_phrase(file_name):
     else:
         return "unknown"
 
+def load_processed_images(output_file):
+    processed_images = set()
+    if os.path.exists(output_file):
+        with open(output_file, 'r') as f:
+            for line in f:
+                data = json.loads(line)
+                processed_images.add(data['image'])
+    return processed_images
+
 def process_images(image_dir, output_file, logger, max_images=10):
     # Initialize the tokenizer and model
     tokenizer, model = initialize_model(MODEL_PATH, TORCH_TYPE)
@@ -32,6 +41,9 @@ def process_images(image_dir, output_file, logger, max_images=10):
     device_map = get_device_map(model, max_memory_per_gpu="20GiB", num_gpus=3)
     model = load_model(model, MODEL_PATH, device_map, TORCH_TYPE)
     model = model.eval()
+
+    # Load already processed images
+    processed_images_set = load_processed_images(output_file)
 
     processed_images = 0
 
@@ -50,6 +62,10 @@ def process_images(image_dir, output_file, logger, max_images=10):
                     # Process each image
                     for image_file in tqdm(os.listdir(disaster_path), desc=f"Processing images in {disaster_dir}", leave=False):
                         if image_file.endswith(".png"):
+                            # Skip if the image has already been processed
+                            if image_file in processed_images_set:
+                                continue
+
                             phrase = extract_phrase(image_file)
                             prompt_template = (
                                 f"Describe this {phrase}-event satellite image in detail. "
