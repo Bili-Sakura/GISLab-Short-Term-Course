@@ -36,7 +36,6 @@ Problems and Solutions:
 
 1. Estimate the model performance for current models ✔
 
-2. Pay attention to labeled data ✔
 
 To-do List:
 
@@ -75,9 +74,9 @@ Problems and Solutions:
 To-do List:
 
 - [x] Further design the pipeline of our experiments (see [here](./docs/pipeline.md/#experiments))
-- [ ] Set up the environment of  [DiffusionSAT](https://github.com/samar-khanna/DiffusionSat), [Stable Diffusion](https://github.com/CompVis/stable-diffusion) and [ControlNet](https://github.com/lllyasviel/ControlNet) respectively
-- [ ] Read the paper and code of [DiffusionSAT](https://github.com/samar-khanna/DiffusionSat)
-- [ ] Think about how to generate batch of prompts with language model assistant.
+- [x] Set up the environment of  [DiffusionSAT](https://github.com/samar-khanna/DiffusionSat), [Stable Diffusion](https://github.com/CompVis/stable-diffusion) and [ControlNet](https://github.com/lllyasviel/ControlNet) respectively
+- [x] Read the paper and code of [DiffusionSAT](https://github.com/samar-khanna/DiffusionSat)
+- [x] Think about how to generate batch of prompts with language model assistant.
 
 ### July<sup>9th</sup>
 
@@ -88,9 +87,9 @@ Problems and Solutions:
 To-do List:
 
 - [x] Read the paper and code of `DiffusionSAT`, see materials [here](./docs/introduction_to_diffusionsat.md) along with [PowerPoint](./lectures/Introduction_to_DiffusionSAT.pptx)
-- [ ] Set up the environment of  [DiffusionSAT](https://github.com/samar-khanna/DiffusionSat), [Stable Diffusion](https://github.com/CompVis/stable-diffusion) and [ControlNet](https://github.com/lllyasviel/ControlNet) respectively
+- [x] Set up the environment of  [DiffusionSAT](https://github.com/samar-khanna/DiffusionSat), [Stable Diffusion](https://github.com/CompVis/stable-diffusion) and [ControlNet](https://github.com/lllyasviel/ControlNet) respectively
   
-- [ ] Think about how to generate batch of prompts with language model assistant.
+- [x] Think about how to generate batch of prompts with language model assistant.
 
 Notes:
 
@@ -108,9 +107,9 @@ To-do List:
 - [x] Generate batch of prompts with language model assistant - [RSGPT](./projects/RSGPT/README.md).
 - [x] Deploy Stable Diffusion 3 on Server which is capable of image-to-image generation
 - [x] DiffusionSat is able to use .json file for batch generation (test-version)
-- [ ] Try [CogVLM2](https://huggingface.co/THUDM/cogvlm2-llama3-chat-19B) for image captioning
-- [ ] Read documentation of [diffusers](https://hf-mirror.com/docs/diffusers/v0.29.2/en/index) package
-- [ ] Prepare dataset for training ControlNet in DiffusionSat, follow [ControlNet training example by diffusers](./docs/train_with_diffusers.md) to train diffusionsat that is able to execute in painting task (i.e. generated post-event image with given pre-event image as shown in [paper](./readings/DiffusionSAT/Khanna%20et%20al_2023_DiffusionSat.pdf))
+- [x] Try [CogVLM2](https://huggingface.co/THUDM/cogvlm2-llama3-chat-19B) for image captioning
+- [x] Read documentation of [diffusers](https://hf-mirror.com/docs/diffusers/v0.29.2/en/index) package
+- [x] Prepare dataset for training ControlNet in DiffusionSat, follow [ControlNet training example by diffusers](./docs/train_with_diffusers.md) to train diffusionsat that is able to execute in painting task (i.e. generated post-event image with given pre-event image as shown in [paper](./readings/DiffusionSAT/Khanna%20et%20al_2023_DiffusionSat.pdf))
 
 ### July<sup>14th</sup>
 
@@ -129,4 +128,7 @@ To-do List:
 Note:
 
 - [x] Discard [RSGPT](./projects/RSGPT/README.md) for captioning and summarization
-- [ ] ...
+
+### July<sup>19th</sup>-July<sup>20th</sup>
+
+- [x] Midterm Presentation
