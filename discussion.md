@@ -1,11 +1,5 @@
 # Discussion
 
-> Contribution Sample:
->
-> **Authors:** Student1 (Stu<sup>1</sup>), Student2 (Stu<sup>1</sup>), Student3 (Stu), Student4 (Stu), Student5 (Stu), TA1 (TA<sup>2</sup>), TA2 (TA<sup>2,3</sup>)
-> 
-> <sup>1</sup> Joint First Author, <sup>2</sup> Coding Leader, <sup>3</sup> Project Leader
-
 
 ---
 
