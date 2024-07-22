@@ -1,5 +1,17 @@
-# Poster Manuscript
+# GFM4D: Conditional Diffusion Model for Post-event Satellite Image Generation
 
 > Overleaf Project: [Link](https://www.overleaf.com/project/667922a3a7c41ed63125f4c1)
+>
+> Contribution Sample:
+>
+> **Authors:** Student1 (Stu<sup>1</sup>), Student2 (Stu<sup>1</sup>), Student3 (Stu), Student4 (Stu), Student5 (Stu), TA1 (TA<sup>2</sup>), TA2 (TA<sup>3</sup>)
+>
+> <sup>1</sup> Joint First Author, <sup>2</sup> Project Leader, <sup>3</sup> Direction Leader
 
-![](../products/assets/poster_demo.png)
+<details>
+<summary>Poster Demo</summary>
+<img src="../products/assets/poster_demo.png">
+</details>
+
+## Introduction
+
