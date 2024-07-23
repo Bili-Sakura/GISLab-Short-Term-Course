@@ -21,9 +21,9 @@
 >     - fp32
 >     - Image-to-image only (base)
 >
->   
+>
 
-##  Main Experiments
+## Main Experiments
 
 ## Ablation Experiment
 
@@ -31,11 +31,12 @@
 
 #### Inference Steps (text-to-image)
 
-
+![](./assets/out/ablation_steps_t2i/ablation_experiment_results.png)
 
 #### Inference Steps (image-to-image)
+
+![](./assets/out/ablation_steps_i2i/ablation_experiment_results.png)
 
 #### Guidance Sacle
 
 #### Image Size
-

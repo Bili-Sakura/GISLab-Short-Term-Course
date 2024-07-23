@@ -130,7 +130,7 @@ DiffusionSAT is able to check image safety.
       │   │   ├── image2_post.png
       │   │   └── ...
       │   ├── captions.json           # Text prompts as well as metadata for each image
-      	├── mask/                   # （opt）Mask images (e.g. region that affected by disaster)
+       ├── mask/                   # （opt）Mask images (e.g. region that affected by disaster)
       │   │   ├── image1_mask.png
       │   │   ├── image2_mask.png
       │   │   └── ...
@@ -160,8 +160,6 @@ DiffusionSAT is able to check image safety.
       }
       ```
   
-      
-
 ### Supplementary Details from DiffusionSat
 
 ![](./assets/teaser.png)
@@ -177,4 +175,3 @@ DiffusionSAT is able to check image safety.
 | Satlas        | "a [satlas] satellite image [of <object>]"                   |
 | Texas Housing | "a [satlas] satellite image [of houses] [built in <year_built>] [covering <num_acres> acres]" |
 | xBD           | "a [fmow] satellite image [<before/after>] being affected by a <disaster_type> natural disaster" |
-
