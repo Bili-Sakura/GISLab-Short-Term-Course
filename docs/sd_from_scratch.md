@@ -176,13 +176,14 @@ pip install -r requirements.txt
     conda create -n sd-all python=3.10
     ```
 
-3. Install more packages
+2. Install more packages
 
     ```bash
     conda install pytorch 
     conda install torchvision
     conda install torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
     pip install transformers accelerate safetensors ipykernel tensorboard
+    pip install open_clip_torch
     conda install -c conda-forge diffusers
     conda install xformers -c xformers
     conda install -c huggingface -c conda-forge datasets
