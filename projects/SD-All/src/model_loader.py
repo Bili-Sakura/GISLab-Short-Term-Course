@@ -11,12 +11,17 @@ from diffusers import (
     UNet2DConditionModel,
     StableDiffusionInstructPix2PixPipeline,
     StableDiffusion3Img2ImgPipeline,
+    CycleDiffusionPipeline,
+    DDIMScheduler,
 )
 from typing import Literal
 
 
 def load_model(
-    model_name, model_path, model_type=Literal["text-to-image", "image-to-image"]
+    model_name,
+    model_path,
+    model_type=Literal["text-to-image", "image-to-image"],
+    model_varient="SDEdit",
 ):
     try:
         if model_name == "sd2":
@@ -24,11 +29,12 @@ def load_model(
                 pipe = DiffusionPipeline.from_pretrained(
                     model_path, torch_dtype=torch.float32
                 )
-                pipe.scheduler = DPMSolverMultistepScheduler.from_config(
-                    pipe.scheduler.config
-                )
-            elif model_type == "image-to-image":
+            elif model_type == "image-to-image" and model_varient == "SDEdit":
                 pipe = StableDiffusionImg2ImgPipeline.from_pretrained(
+                    model_path, torch_dtype=torch.float32
+                )
+            elif model_type == "image-to-image" and model_varient == "CycleDiffusion":
+                pipe = CycleDiffusionPipeline.from_pretrained(
                     model_path, torch_dtype=torch.float32
                 )
             else:
@@ -96,7 +102,7 @@ def load_model(
                     safety_checker=None,
                     torch_dtype=torch.float32,
                 )
-            elif model_type == "image-to-image":
+            elif model_type == "image-to-image" and model_varient == "SDEdit":
                 unet = UNet2DConditionModel.from_pretrained(
                     os.path.join(model_path, "checkpoint-150000"),
                     subfolder="unet",
@@ -104,6 +110,19 @@ def load_model(
                     use_safetensors=False,
                 )
                 pipe = StableDiffusionImg2ImgPipeline.from_pretrained(
+                    sd2_model_path,
+                    unet=unet,
+                    safety_checker=None,
+                    torch_dtype=torch.float32,
+                )
+            elif model_type == "image-to-image" and model_varient == "CycleDiffusion":
+                unet = UNet2DConditionModel.from_pretrained(
+                    os.path.join(model_path, "checkpoint-150000"),
+                    subfolder="unet",
+                    torch_dtype=torch.float32,
+                    use_safetensors=False,
+                )
+                pipe = CycleDiffusionPipeline.from_pretrained(
                     sd2_model_path,
                     unet=unet,
                     safety_checker=None,

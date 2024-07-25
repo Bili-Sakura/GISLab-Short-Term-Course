@@ -1,0 +1,20 @@
+{
+  "_name_or_path": "E:/diffusers/cache/vit",
+  "architectures": [
+    "Blip2VisionModel"
+  ],
+  "attention_dropout": 0.0,
+  "hidden_act": "quick_gelu",
+  "hidden_size": 1024,
+  "image_size": 224,
+  "initializer_range": 1e-10,
+  "intermediate_size": 4096,
+  "layer_norm_eps": 1e-05,
+  "model_type": "blip_2_vision_model",
+  "num_attention_heads": 16,
+  "num_hidden_layers": 23,
+  "patch_size": 14,
+  "qkv_bias": true,
+  "torch_dtype": "float32",
+  "transformers_version": "4.31.0"
+}
