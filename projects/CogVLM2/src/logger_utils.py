@@ -1,19 +1,32 @@
-import os
 import logging
+from datetime import datetime
+from pytz import timezone
 
-def setup_logging():
-    log_file = os.path.join('./log', 'captioning.log')
-    os.makedirs(os.path.dirname(log_file), exist_ok=True)
+def time_in_utc_plus_8(*args):
+    """
+    Convert the current UTC time to UTC+8.
+    """
+    tz = timezone('Asia/Shanghai')
+    return datetime.now(tz).timetuple()
 
-    logger = logging.getLogger('caption_logger')
-    logger.setLevel(logging.DEBUG)
-    fh = logging.FileHandler(log_file)
-    fh.setLevel(logging.DEBUG)
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.WARNING)  # Set console handler to WARNING to avoid info logs in terminal
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    fh.setFormatter(formatter)
-    ch.setFormatter(formatter)
-    logger.addHandler(fh)
-    logger.addHandler(ch)
-    return logger
+def setup_logging(log_file_path, log_level=logging.INFO):
+    """
+    Set up logging configuration with UTC+8 time zone.
+
+    Args:
+        log_file_path (str): The file path for the log file.
+        log_level (int): The logging level (default is logging.INFO).
+    """
+    logging.basicConfig(
+        filename=log_file_path,
+        level=log_level,
+        format="%(asctime)s:%(levelname)s:%(message)s",
+    )
+
+    # Create a custom formatter with the time conversion
+    formatter = logging.Formatter("%(asctime)s:%(levelname)s:%(message)s")
+    formatter.converter = time_in_utc_plus_8
+
+    # Update the logging handlers with the new formatter
+    for handler in logging.getLogger().handlers:
+        handler.setFormatter(formatter)

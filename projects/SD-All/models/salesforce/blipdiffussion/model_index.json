@@ -1,0 +1,43 @@
+{
+  "_class_name": "BlipDiffusionPipeline",
+  "_diffusers_version": "0.18.0.dev0",
+  "ctx_begin_pos": 2,
+  "image_processor": [
+    "blip_diffusion",
+    "BlipImageProcessor"
+  ],
+  "mean": [
+    0.48145466,
+    0.4578275,
+    0.40821073
+  ],
+  "qformer": [
+    "blip_diffusion",
+    "Blip2QFormerModel"
+  ],
+  "scheduler": [
+    "diffusers",
+    "PNDMScheduler"
+  ],
+  "std": [
+    0.26862954,
+    0.26130258,
+    0.27577711
+  ],
+  "text_encoder": [
+    "blip_diffusion",
+    "ContextCLIPTextModel"
+  ],
+  "tokenizer": [
+    "transformers",
+    "CLIPTokenizer"
+  ],
+  "unet": [
+    "diffusers",
+    "UNet2DConditionModel"
+  ],
+  "vae": [
+    "diffusers",
+    "AutoencoderKL"
+  ]
+}

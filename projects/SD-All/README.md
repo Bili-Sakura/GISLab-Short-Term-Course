@@ -15,6 +15,6 @@ python ./test/sd2_text_to_image.py
 python ./test/diffusionsat_text_to_image.py
 # 
 CUDA_VISIBLE_DEVICES=1 python scripts/ablation_steps_t2i.py
-CUDA_VISIBLE_DEVICES=1 python scripts/ablation_steps_i2i.py
+CUDA_VISIBLE_DEVICES=3 python scripts/ablation_steps_i2i.py
 ```
 
