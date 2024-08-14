@@ -1,38 +1,37 @@
 {
-    "_class_name": "StableDiffusionControlNetPipeline",
-    "_diffusers_version": "0.17.0.dev0",
-    "controlnet": [
-      null,
-      "ControlNetModel"
-    ],
-    "feature_extractor": [
-      "transformers",
-      "CLIPImageProcessor"
-    ],
-    "requires_safety_checker": false,
-    "safety_checker": [
-      null,
-      null
-    ],
-    "scheduler": [
-      "diffusers",
-      "DDIMScheduler"
-    ],
-    "text_encoder": [
-      "transformers",
-      "CLIPTextModel"
-    ],
-    "tokenizer": [
-      "transformers",
-      "CLIPTokenizer"
-    ],
-    "unet": [
-      null,
-      "SatUNet"
-    ],
-    "vae": [
-      "diffusers",
-      "AutoencoderKL"
-    ]
-  }
-  
+  "_class_name": "StableDiffusionControlNetPipeline",
+  "_diffusers_version": "0.17.0.dev0",
+  "controlnet": [
+    null,
+    "ControlNetModel"
+  ],
+  "feature_extractor": [
+    "transformers",
+    "CLIPImageProcessor"
+  ],
+  "requires_safety_checker": false,
+  "safety_checker": [
+    null,
+    null
+  ],
+  "scheduler": [
+    "diffusers",
+    "DDIMScheduler"
+  ],
+  "text_encoder": [
+    "transformers",
+    "CLIPTextModel"
+  ],
+  "tokenizer": [
+    "transformers",
+    "CLIPTokenizer"
+  ],
+  "unet": [
+    null,
+    "SatUNet"
+  ],
+  "vae": [
+    "diffusers",
+    "AutoencoderKL"
+  ]
+}

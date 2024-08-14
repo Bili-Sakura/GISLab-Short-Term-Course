@@ -136,8 +136,8 @@ def calculate_average_ssim(folder1, folder2):
 
 
 if __name__ == "__main__":
-    dir1 = "E:/2024duanxueqi/Dataset/Detailed_Dataset_100/pre"
-    dir2 = "E:/2024duanxueqi/Dataset/Detailed_Dataset_100/post"
+    dir1 = "./pre"
+    dir2 = "./post"
 
     calculate_lpips(dir1, dir2)
     calculate_average_mse(dir1, dir2)

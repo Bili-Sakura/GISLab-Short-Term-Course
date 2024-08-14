@@ -1,0 +1,18 @@
+# config.yaml
+model:
+  name: "flan-t5-xxl"
+  path: "./models/flan-t5-xxl"
+
+data:
+  input_file: "./data/captions_demo.jsonl"
+  output_file: "./out/captions_summarization_demo.jsonl"
+
+logging:
+  log_file: "./log/captioning.log"
+
+summarization:
+  few_shot_examples:
+    - input: "Text to be summarized for example 1. This is a detailed text example."
+      output: "Example summary 1."
+    - input: "Text to be summarized for example 2. Another detailed text example."
+      output: "Example summary 2."

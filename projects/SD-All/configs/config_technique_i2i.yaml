@@ -1,0 +1,33 @@
+# configs/config_technique_i2i.yaml
+
+models:
+  - name: "sd2"
+    model_varient: "SDEdit" # Default = "SDEdit"
+    path: "models/stabilityai/stable-diffusion-2-1"
+  - name: "sd2"
+    model_varient: "CycleDiffusion"
+    path: "models/stabilityai/stable-diffusion-2-1"
+  - name: "diffusionsat"
+    model_varient: "SDEdit"
+    path: "models/fsx/proj-satdiffusion/finetune_sd21_sn-satlas-fmow_snr5_md7norm_bs64"
+  - name: "diffusionsat"
+    model_varient: "CycleDiffusion"
+    path: "models/fsx/proj-satdiffusion/finetune_sd21_sn-satlas-fmow_snr5_md7norm_bs64"
+
+
+data:
+  ref_image: "data/samples/hurricane-matthew_00000066_2_pre_disaster.png"
+  output_folder: "out/ablation_technique_i2i"
+
+ablation_config:
+  inference_steps: 20
+  height: 512
+  width: 512
+  guidance_scale: 7.0
+  prompt:
+    source_prompt: "A satellite image of residential area before hurricane."
+    target_prompt: "A satellite image of residential area after hurricane"
+  seed: 0
+
+logging:
+  log_file: "log/ablation_technique_i2i.log"
