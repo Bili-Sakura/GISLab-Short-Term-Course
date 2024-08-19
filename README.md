@@ -266,3 +266,9 @@ Also, as xBD [6] dataset only contains ~11k pre-event&post-event image pairs wit
 > [8] C. Schuhmann *et al.*, ‘LAION-5B: An open large-scale dataset for training next generation image-text models’, in *Advances in Neural Information Processing Systems*, Dec. 2022, pp. 25278–25294. Accessed: Jul. 20, 2024. [Online]. Available: https://proceedings.neurips.cc/paper_files/paper/2022/hash/a1859debfb3b59d094f3504d5ebb6c25-Abstract-Datasets_and_Benchmarks.html
 >
 > [9] A. Krizhevsky, I. Sutskever, and G. E. Hinton, ‘ImageNet Classification with Deep Convolutional Neural Networks’, in *Neural Information Processing Systems*, Curran Associates, Inc., 2012. Accessed: Apr. 29, 2024. [Online]. Available: https://papers.nips.cc/paper_files/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html
+
+### August<sup>19th</sup>
+
+- Add [Keynote](lectures/Temporal_Image-to-Image_Generation.pptx) for Temporal Generation Techniques, see Keynote in [PDF](./lectures/Temporal_Image-to-Image_Generation.pdf)
+- Add [Keynote](lectures/Workflow_of_Image_Captioning_for_Disaster_RSIs.pptx) for Image Captioning for RSIs, see Keynote in [PDF](./lectures/Workflow_of_Image_Captioning_for_Disaster_RSIs.pdf)
+
