@@ -49,8 +49,6 @@ Fine-tuned Model on SD2
 
 ## Main Experiments
 
-###
-
 | Models                            | FID  | CLIP-Score | SSIM | PSNR |
 | --------------------------------- | ---- | ---------- | ---- | ---- |
 | **Base Model**                    | /    | /          | /    | /    |
