@@ -216,4 +216,3 @@ pip install -r requirements.txt
    ```
 
 [Working with TIFF files (kaggle.com)](https://www.kaggle.com/code/yassinealouini/working-with-tiff-files)
-
