@@ -6,6 +6,22 @@ See online keynote(.md) [here](./docs/keynote.md).
 
 Keynote(.pptx) download link [here](https://pan.baidu.com/s/1NAZi_NWV3lNLi1rNXhJxhA?pwd=0702).
 
+## Experiments and Results
+
+
+
+
+
+### 1. Text-to-Image
+
+> We use the DDPM sampler with 500 steps and a guidance scale of 7.5. Images are generated with 512×512 pixels. Models are used in half precision (float16).
+
+![](assets/result_pics/figure1.png)
+
+<div align="center">Figure 1: Text-to-image remote sensing image generation given prompts related to different disaster type. Prompt = f"A satellite image of town suffers from {disaster_type}", where disaster_type takes flooding, wildfire,hurricane,tornado,earthquake and volcanic eruption from left to right respectively. The model used from top to bottom are sd2,sdxl,sd3 and diffusionsat respectively.</div>
+
+### 2. Image-to-Image Translation
+
 ## Agenda & Discussion Board
 
 ### July<sup>3rd</sup>
@@ -273,4 +289,4 @@ Also, as xBD [6] dataset only contains ~11k pre-event&post-event image pairs wit
 
 ### August<sup>20th-23rd</sup>
 
-- Add Whole Project Keynote, see [PDF](./products/GFM4D-0823.pdf)
+- Add Whole Project Keynote, see [PDF](./products/GFM4D-0826.pdf)
