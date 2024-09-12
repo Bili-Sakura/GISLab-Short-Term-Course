@@ -50,19 +50,47 @@ More Varients (same seed with different guiding scale)
 
 ### 3. Interpretation from Attention Map Visualization
 
-We use daam [3] to visualize how diffusion models understand prompt by visualizing the attention map.
+We use DaaM [3] to visualize how diffusion models understand prompt by visualizing the attention map. Here, we take flooding as an example.
 
-#### Spatial Constrains 
+> We use the DDPM sampler with 500 steps and a guidance scale of 5.0. Images are generated with 512×512 pixels. Models are used in half precision (float16). The image editing method is SDEdit. All experiments are done on sd2.
+
+#### Detailed Desctiption (text-to-image)
+
+![](assets/result_pics/figure3.png)
+
+![](assets/result_pics/figure3_detailed.png)
+
+<div align="center">Prompt=" A satellite image reveals a devastating flood,with waterlogged streets and houses, and patches of greenery emerging amidst the submerged landscape." visualized_word=["satellite image","reveals","devastating","flood","waterlogged"] and ["streets","houses","greenery","submerged","landscape"]</div> 
+
+#### Spatial Constrains (image-to-image)
+
+![](assets/result_pics/figure3_pre-image.png)
 
 ![](assets/result_pics/figure3_spatial.png)
 
-<div align="center">Prompt=""</div> 
+![](assets/result_pics/figure3_spatial_heatmap.png)
 
-#### Building Damage Degree
+<div align="center">Prompt=f"A satellite image suffers from a flooding where buildings on the {position} are being flooded." Position takes from top-left, top-right, bottom-left and bottom-right.</div> 
 
-![](assets/result_pics/figure3_damage.png)
+#### Building Damage Degree (image-to-image)
 
-<div align="center">Prompt=""</div> 
+![](assets/result_pics/figure3_pre-image.png)
+
+![](assets/result_pics/figure3_damage1.png)
+
+![](assets/result_pics/figure3_damage1_heatmap.png)
+
+<div align="center">Prompt=f"Buidings are {damage_degree} after a flooding." Damage_degree takes from no damaged, minor damaged, major damaged and destroyed.</div> 
+
+![](assets/result_pics/figure3_pre-image.png)
+
+![](assets/result_pics/figure3_damage2.png)
+
+![](assets/result_pics/figure3_damage2_heatmap.png)
+
+
+
+<div align="center">Prompt=f"Buidings are {damage_description} after a flooding." Damage_degree takes from (No Damage)"Undisturbed. No sign of water, structural or shingle damage, or burn marks.", (Minor Damage)"Building partially burnt, water surrounding structure, volcanic flow nearby, roof elements missing, or visible cracks.", (Major Damage) "Partial wall or roof collapse, encroaching volcanic flow, or surrounded by water/mud.",  and (Destroyed) "Scorched, completely collapsed, partially/completely covered with water/mud, or otherwise no longer present." Visualization is taken on word "buidings". This Joint Damage Scale descriptions on a four-level granularity scheme are taken from xBD.</div> 
 
 ### References
 
