@@ -14,13 +14,63 @@ Keynote(.pptx) download link [here](https://pan.baidu.com/s/1NAZi_NWV3lNLi1rNXhJ
 
 ### 1. Text-to-Image
 
-> We use the DDPM sampler with 500 steps and a guidance scale of 7.5. Images are generated with 512×512 pixels. Models are used in half precision (float16).
+> We use the DDPM [1] sampler with 500 steps and a guidance scale of 7.5. Images are generated with 512×512 pixels. Models are used in half precision (float16).
 
 ![](assets/result_pics/figure1.png)
 
-<div align="center">Figure 1: Text-to-image remote sensing image generation given prompts related to different disaster type. Prompt = f"A satellite image of town suffers from {disaster_type}", where disaster_type takes flooding, wildfire,hurricane,tornado,earthquake and volcanic eruption from left to right respectively. The model used from top to bottom are sd2,sdxl,sd3 and diffusionsat respectively.</div>
+<div align="center">Figure 1: Text-to-image remote sensing image generation given prompts related to different disaster type. Prompt = f"A satellite image of town suffering from {disaster_type}", where disaster_type takes flooding, wildfire,hurricane,tornado,earthquake and volcanic eruption from left to right respectively. The model used from top to bottom are sd2,sdxl,sd3 and diffusionsat respectively.</div>
+
+More Varients (using different seeds only)
+
+![](assets/result_pics/figure1_1.png)
+
+![](assets/result_pics/figure1_2.png)
 
 ### 2. Image-to-Image Translation
+
+> We use the DDPM [1] sampler with 500 steps and a guidance scale of 5.0. Images are generated with 512×512 pixels. Models are used in half precision (float16). The image editing method is SDEdit [2].
+
+
+
+
+
+![](assets/result_pics/figure2.png)
+
+<div align="center">Figure 2: Image-to-image remote sensing image generation given prompts related to different disaster type. From left to right, images are in the order of predicted pre-event image, ground truth pre-event image, ground truth post-event image and predicted post-event image. Pre-to-post prompt = f"A satellite image  after being affected by {disaster_type}" while post-to-pre prompt =f"A satellite image before being affected by {disaster_type}", where disaster_type takes flooding, wildfire,hurricane,tornado,earthquake and volcanic eruption from top to bottom respectively. All images are generated with sd2 while ground truth images are derived from xBD. We use guidingscale as 7.0 here.</div>
+
+More Varients (same seed with different guiding scale)
+
+![](assets/result_pics/figure2_1.png)
+
+<div align="center">(The same seed as above while guidingscale = 1.0)</div>
+
+![](assets/result_pics/figure2_2.png)
+
+<div align="center">(The same seed as above while guidingscale = 7.0)</div>
+
+### 3. Interpretation from Attention Map Visualization
+
+We use daam [3] to visualize how diffusion models understand prompt by visualizing the attention map.
+
+#### Spatial Constrains 
+
+![](assets/result_pics/figure3_spatial.png)
+
+<div align="center">Prompt=""</div> 
+
+#### Building Damage Degree
+
+![](assets/result_pics/figure3_damage.png)
+
+<div align="center">Prompt=""</div> 
+
+### References
+
+[1] J. Song, C. Meng, and S. Ermon, “Denoising Diffusion Implicit Models,” presented at the International Conference on Learning Representations, Oct. 2020. 
+
+[2] C. Meng *et al.*, “SDEdit: Guided Image Synthesis and Editing with Stochastic Differential Equations,” presented at the International Conference on Learning Representations, Oct. 2021. 
+
+[3] R. Tang *et al.*, “What the DAAM: Interpreting Stable Diffusion Using Cross Attention,” presented at the ACL 2023, A. Rogers, J. Boyd-Graber, and N. Okazaki, Eds., Toronto, Canada: Association for Computational Linguistics, Jul. 2023, pp. 5644–5659. doi: [10.18653/v1/2023.acl-long.310](https://doi.org/10.18653/v1/2023.acl-long.310).
 
 ## Agenda & Discussion Board
 
